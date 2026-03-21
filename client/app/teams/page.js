@@ -1,28 +1,31 @@
-import { getAllPlayers } from "../../services/playerService";
-import PageContainer from "../../components/PageContainer";
-import PlayerList from "../../components/PlayerList";
-import ErrorState from "../../components/ErrorState";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useEffect, useState } from "react";
 
-export default async function PlayersPage() {
-  let players = [];
-  let error = null;
+export default function TeamsPage() {
+  const [teams, setTeams] = useState([]);
 
-  try {
-    const res = await getAllPlayers();
-    players = res.data || [];
-  } catch (err) {
-    error = err.message;
-  }
+  useEffect(() => {
+    fetch("https://cricnova-backend.onrender.com/api/teams")
+      .then((res) => res.json())
+      .then((data) => setTeams(data.data));
+  }, []);
 
   return (
-    <PageContainer title="Players">
-      {error ? (
-        <ErrorState message="Failed to fetch players" />
-      ) : (
-        <PlayerList players={players} />
-      )}
-    </PageContainer>
+    <div className="p-6 text-white">
+      <h1 className="text-2xl font-bold mb-4">Teams</h1>
+
+      <div className="grid grid-cols-2 gap-4">
+        {teams.map((team) => (
+          <div
+            key={team.id}
+            className="p-4 border border-gray-700 rounded-lg"
+          >
+            <h2 className="text-lg font-semibold">{team.name}</h2>
+            <p className="text-sm text-gray-400">{team.country}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
