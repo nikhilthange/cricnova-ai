@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String      @id @default(uuid())
+  name         String
+  email        String      @unique
+  password     String
+  role         UserRole    @default(USER)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  favorites    Favorite[]
+}
+
+model Team {
+  id              String          @id @default(uuid())
+  name            String
+  shortName       String          @unique
+  logoUrl         String?
+  country         String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  homeMatches     Match[]         @relation("HomeTeamMatches")
+  awayMatches     Match[]         @relation("AwayTeamMatches")
+  players         Player[]
+  teamStats       TeamMatchStat[]
+}
+
+model Player {
+  id              String            @id @default(uuid())
+  name            String
+  role            PlayerRole
+  battingStyle    String?
+  bowlingStyle    String?
+  nationality     String?
+  imageUrl        String?
+  teamId          String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  team            Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  playerStats     PlayerMatchStat[]
+}
+
+model Venue {
+  id              String       @id @default(uuid())
+  name            String
+  city            String
+  country         String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  matches         Match[]
+}
+
+model Tournament {
+  id              String       @id @default(uuid())
+  name            String
+  season          String
+  format          String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  matches         Match[]
+}
+
+model Match {
+  id                  String             @id @default(uuid())
+  title               String
+  status              MatchStatus        @default(UPCOMING)
+  matchDate           DateTime
+  tossWinner          String?
+  tossDecision        String?
+  resultSummary       String?
+  homeTeamId          String
+  awayTeamId          String
+  venueId             String
+  tournamentId        String
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  homeTeam            Team               @relation("HomeTeamMatches", fields: [homeTeamId], references: [id])
+  awayTeam            Team               @relation("AwayTeamMatches", fields: [awayTeamId], references: [id])
+  venue               Venue              @relation(fields: [venueId], references: [id])
+  tournament          Tournament         @relation(fields: [tournamentId], references: [id])
+
+  innings             Inning[]
+  teamStats           TeamMatchStat[]
+  playerStats         PlayerMatchStat[]
+  predictions         Prediction[]
+  favorites           Favorite[]
+}
+
+model Inning {
+  id              String       @id @default(uuid())
+  matchId         String
+  inningNumber    Int
+  battingTeam     String
+  bowlingTeam     String
+  runs            Int          @default(0)
+  wickets         Int          @default(0)
+  overs           Float        @default(0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  match           Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model TeamMatchStat {
+  id                  String      @id @default(uuid())
+  matchId             String
+  teamId              String
+  totalRuns           Int         @default(0)
+  totalWicketsLost    Int         @default(0)
+  oversPlayed         Float       @default(0)
+  runRate             Float       @default(0)
+  wicketsTaken        Int         @default(0)
+  createdAt           DateTime    @default(now())
+
+  match               Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team                Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, teamId])
+}
+
+model PlayerMatchStat {
+  id                  String      @id @default(uuid())
+  matchId             String
+  playerId            String
+  runs                Int         @default(0)
+  ballsFaced          Int         @default(0)
+  fours               Int         @default(0)
+  sixes               Int         @default(0)
+  strikeRate          Float       @default(0)
+  wickets             Int         @default(0)
+  oversBowled         Float       @default(0)
+  runsConceded        Int         @default(0)
+  economy             Float       @default(0)
+  catches             Int         @default(0)
+  runOuts             Int         @default(0)
+  createdAt           DateTime    @default(now())
+
+  match               Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player              Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, playerId])
+}
+
+model Prediction {
+  id                    String      @id @default(uuid())
+  matchId               String
+  predictedWinner       String?
+  homeWinProbability    Float?
+  awayWinProbability    Float?
+  projectedTotal        Int?
+  topScorer             String?
+  topWicketTaker        String?
+  confidence            Float?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  match                 Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  id              String      @id @default(uuid())
+  userId          String
+  matchId         String
+  createdAt       DateTime    @default(now())
+
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match           Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PlayerRole {
+  BATTER
+  BOWLER
+  ALL_ROUNDER
+  WICKET_KEEPER
+}
+
+enum MatchStatus {
+  UPCOMING
+  LIVE
+  COMPLETED
+}
