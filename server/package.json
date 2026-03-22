@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "src/server.js",
   "scripts": {
-  "dev": "nodemon src/server.js",
-  "start": "node src/server.js"
-},
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
+    "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",

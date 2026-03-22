@@ -8,6 +8,8 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
+    { name: "Live", href: "/live" },
+    { name: "Dashboard", href: "/dashboard" },
     { name: "Teams", href: "/teams" },
     { name: "Matches", href: "/matches" },
     { name: "Players", href: "/players" },

@@ -10,6 +10,9 @@ const predictionRoutes = require("./routes/prediction.routes");
 const inningRoutes = require("./routes/inning.routes");
 const teamStatRoutes = require("./routes/teamStat.routes");
 const playerStatRoutes = require("./routes/playerStat.routes");
+const liveRoutes = require("./routes/live.routes");
+const upcomingPredictionRoutes = require("./routes/upcomingPrediction.routes");
+
 
 const app = express();
 
@@ -39,5 +42,7 @@ app.use("/api/predictions", predictionRoutes);
 app.use("/api/innings", inningRoutes);
 app.use("/api/team-stats", teamStatRoutes);
 app.use("/api/player-stats", playerStatRoutes);
+app.use("/api/live", liveRoutes);
+app.use("/api/upcoming-prediction", upcomingPredictionRoutes);
 
 module.exports = app;
