@@ -1,39 +1,68 @@
-import { getAllMatches } from "../../services/matchService";
-import MatchCard from "../../components/MatchCard";
-import PageContainer from "../../components/PageContainer";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import API_BASE_URL from "../../services/api";
 
-export default async function MatchesPage() {
-  let matches = [];
-  let error = null;
+export default function MatchesPage() {
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  try {
-    const res = await getAllMatches();
-    matches = res.data || [];
-  } catch (err) {
-    error = err.message;
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/matches`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMatches(data.data || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch matches:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black p-6 text-white">
+        <h1 className="mb-4 text-2xl font-bold">Matches</h1>
+        <p>Loading matches...</p>
+      </div>
+    );
   }
 
   return (
-    <PageContainer title="All Matches">
-      {error && (
-        <p className="rounded-lg bg-red-900/40 p-4 text-red-300">
-          Failed to fetch matches
-        </p>
-      )}
+    <div className="min-h-screen bg-black p-6 text-white">
+      <h1 className="mb-6 text-2xl font-bold">Matches</h1>
 
-      {!error && matches.length === 0 && (
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 text-gray-400">
-          No matches found.
+      {matches.length === 0 ? (
+        <p className="text-gray-400">No matches found.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {matches.map((match) => (
+            <Link href={`/matches/${match.id}`} key={match.id}>
+              <div className="cursor-pointer rounded-lg border border-gray-700 p-4 hover:bg-gray-800">
+                <h2 className="text-lg font-semibold">{match.title}</h2>
+                <p className="text-sm text-gray-400">Status: {match.status}</p>
+                <p className="text-sm text-gray-400">
+                  {match.homeTeam?.name || "Home Team"} vs{" "}
+                  {match.awayTeam?.name || "Away Team"}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {match.matchDate
+                    ? new Date(match.matchDate).toLocaleString()
+                    : "Date not available"}
+                </p>
+                <p className="mt-2 text-sm text-gray-400">
+                  Venue: {match.venue?.name || "Not available"}
+                </p>
+                <p className="text-sm text-gray-400">
+                  Tournament: {match.tournament?.name || "Not available"}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       )}
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {matches.map((match) => (
-          <MatchCard key={match.id} match={match} />
-        ))}
-      </div>
-    </PageContainer>
+    </div>
   );
 }

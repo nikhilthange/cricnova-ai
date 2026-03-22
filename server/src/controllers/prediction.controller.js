@@ -80,8 +80,29 @@ const getPredictionsByMatchId = async (req, res) => {
     });
   }
 };
+const getAllPredictions = async (req, res) => {
+  try {
+    const predictions = await prisma.prediction.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.status(200).json({
+      success: true,
+      count: predictions.length,
+      data: predictions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch predictions",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
   createPrediction,
   getPredictionsByMatchId,
+  getAllPredictions,
+  
 };

@@ -1,31 +1,58 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import API_BASE_URL from "../../services/api";
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://cricnova-backend.onrender.com/api/teams")
+    fetch(`${API_BASE_URL}/teams`)
       .then((res) => res.json())
-      .then((data) => setTeams(data.data));
+      .then((data) => {
+        setTeams(data.data || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch teams:", error);
+        setLoading(false);
+      });
   }, []);
 
-  return (
-    <div className="p-6 text-white">
-      <h1 className="text-2xl font-bold mb-4">Teams</h1>
-
-      <div className="grid grid-cols-2 gap-4">
-        {teams.map((team) => (
-          <div
-            key={team.id}
-            className="p-4 border border-gray-700 rounded-lg"
-          >
-            <h2 className="text-lg font-semibold">{team.name}</h2>
-            <p className="text-sm text-gray-400">{team.country}</p>
-          </div>
-        ))}
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black p-6 text-white">
+        <h1 className="mb-4 text-2xl font-bold">Teams</h1>
+        <p>Loading teams...</p>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black p-6 text-white">
+      <h1 className="mb-6 text-2xl font-bold">Teams</h1>
+
+      {teams.length === 0 ? (
+        <p className="text-gray-400">No teams found.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {teams.map((team) => (
+            <Link href={`/teams/${team.id}`} key={team.id}>
+              <div className="cursor-pointer rounded-lg border border-gray-700 p-4 hover:bg-gray-800">
+                <h2 className="text-lg font-semibold">{team.name}</h2>
+                <p className="text-sm text-gray-400">
+                  Short Name: {team.shortName}
+                </p>
+                <p className="text-sm text-gray-400">
+                  Country: {team.country || "N/A"}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

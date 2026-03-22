@@ -1,175 +1,102 @@
-import { getMatchById } from "../../../services/matchService";
-import PredictionCard from "../../../components/PredictionCard";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import API_BASE_URL from "../../../services/api";
 
-export default async function MatchDetailsPage({ params }) {
-  const { id } = await params;
+export default function MatchDetailsPage() {
+  const { id } = useParams();
+  const [match, setMatch] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  let match = null;
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/matches/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMatch(data.data || null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch match:", error);
+        setLoading(false);
+      });
+  }, [id]);
 
-  try {
-    const result = await getMatchById(id);
-    match = result.data;
-  } catch (error) {
+  if (loading) {
     return (
-      <main className="min-h-screen bg-black p-10 text-white">
-        <p className="text-red-500">Failed to fetch match</p>
-      </main>
+      <div className="min-h-screen bg-black p-6 text-white">
+        <p>Loading match details...</p>
+      </div>
     );
   }
 
   if (!match) {
     return (
-      <main className="min-h-screen bg-black p-10 text-white">
-        <p>No match found</p>
-      </main>
+      <div className="min-h-screen bg-black p-6 text-white">
+        <p>Match not found.</p>
+      </div>
     );
   }
 
-  const latestPrediction =
+  const prediction =
     match.predictions && match.predictions.length > 0
       ? match.predictions[0]
       : null;
 
   return (
-    <main className="min-h-screen bg-black p-10 text-white">
-      <h1 className="mb-4 text-4xl font-bold">{match.title}</h1>
+    <div className="min-h-screen bg-black p-6 text-white">
+      <h1 className="mb-4 text-3xl font-bold">{match.title}</h1>
 
-      <div className="mb-8 grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 lg:col-span-2">
-          <p className="text-lg text-gray-200">
-            {match.homeTeam?.name} vs {match.awayTeam?.name}
-          </p>
-          <p className="mt-2 text-gray-400">Status: {match.status}</p>
-          <p className="mt-1 text-gray-400">
-            Date: {new Date(match.matchDate).toLocaleString()}
-          </p>
-          <p className="mt-1 text-gray-400">
-            Venue: {match.venue?.name || "N/A"}
-          </p>
-          <p className="mt-1 text-gray-400">
-            Tournament: {match.tournament?.name || "N/A"}{" "}
-            {match.tournament?.season || ""}
-          </p>
-          <p className="mt-1 text-gray-400">
-            Result: {match.resultSummary || "Not available"}
-          </p>
-        </div>
-
-        <div>
-          {latestPrediction ? (
-            <PredictionCard prediction={latestPrediction} />
-          ) : (
-            <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 text-gray-400">
-              No predictions available.
-            </div>
-          )}
-        </div>
+      <div className="mb-6 rounded-lg border border-gray-700 p-4">
+        <p className="text-lg">
+          {match.homeTeam?.name || "Home Team"} vs{" "}
+          {match.awayTeam?.name || "Away Team"}
+        </p>
+        <p className="mt-2 text-gray-400">Status: {match.status}</p>
+        <p className="text-gray-400">
+          Date:{" "}
+          {match.matchDate
+            ? new Date(match.matchDate).toLocaleString()
+            : "Not available"}
+        </p>
+        <p className="text-gray-400">
+          Venue: {match.venue?.name || "Not available"}
+        </p>
+        <p className="text-gray-400">
+          Tournament: {match.tournament?.name || "Not available"}
+        </p>
+        <p className="text-gray-400">
+          Result: {match.resultSummary || "Not available"}
+        </p>
       </div>
 
-      <section className="mb-8">
-        <h2 className="mb-4 text-2xl font-semibold">Score Summary</h2>
+      <h2 className="mb-3 text-2xl font-semibold">Prediction</h2>
 
-        {match.innings?.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {match.innings.map((inning) => (
-              <div
-                key={inning.id}
-                className="rounded-2xl border border-gray-800 bg-gray-900 p-5"
-              >
-                <p className="text-lg font-semibold text-white">
-                  {inning.battingTeam}
-                </p>
-                <p className="mt-2 text-2xl font-bold text-green-400">
-                  {inning.runs}/{inning.wickets}
-                </p>
-                <p className="mt-1 text-gray-400">Overs: {inning.overs}</p>
-                <p className="mt-1 text-gray-400">
-                  Against: {inning.bowlingTeam}
-                </p>
-                <p className="mt-1 text-gray-500">
-                  Inning {inning.inningNumber}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 text-gray-400">
-            No innings data available.
-          </div>
-        )}
-      </section>
-
-      <section className="mb-8">
-        <h2 className="mb-4 text-2xl font-semibold">Team Stats</h2>
-
-        {match.teamStats?.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {match.teamStats.map((stat) => (
-              <div
-                key={stat.id}
-                className="rounded-2xl border border-gray-800 bg-gray-900 p-5"
-              >
-                <p className="text-lg font-semibold text-white">
-                  {stat.team?.name}
-                </p>
-                <p className="mt-2 text-gray-400">Runs: {stat.totalRuns}</p>
-                <p className="mt-1 text-gray-400">
-                  Wickets Lost: {stat.totalWicketsLost}
-                </p>
-                <p className="mt-1 text-gray-400">
-                  Overs Played: {stat.oversPlayed}
-                </p>
-                <p className="mt-1 text-gray-400">Run Rate: {stat.runRate}</p>
-                <p className="mt-1 text-gray-400">
-                  Wickets Taken: {stat.wicketsTaken}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 text-gray-400">
-            No team stats available.
-          </div>
-        )}
-      </section>
-
-      <section>
-        <h2 className="mb-4 text-2xl font-semibold">Player Stats</h2>
-
-        {match.playerStats?.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {match.playerStats.map((stat) => (
-              <div
-                key={stat.id}
-                className="rounded-2xl border border-gray-800 bg-gray-900 p-5"
-              >
-                <p className="text-gray-300">{stat.player?.name}</p>
-                <p className="mt-2 text-gray-400">Runs: {stat.runs}</p>
-                <p className="mt-1 text-gray-400">Balls: {stat.ballsFaced}</p>
-                <p className="mt-1 text-gray-400">4s: {stat.fours}</p>
-                <p className="mt-1 text-gray-400">6s: {stat.sixes}</p>
-                <p className="mt-1 text-gray-400">
-                  Strike Rate: {stat.strikeRate}
-                </p>
-                <p className="mt-1 text-gray-400">Wickets: {stat.wickets}</p>
-                <p className="mt-1 text-gray-400">
-                  Overs Bowled: {stat.oversBowled}
-                </p>
-                <p className="mt-1 text-gray-400">
-                  Runs Conceded: {stat.runsConceded}
-                </p>
-                <p className="mt-1 text-gray-400">Economy: {stat.economy}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6 text-gray-400">
-            No player stats available.
-          </div>
-        )}
-      </section>
-    </main>
+      {prediction ? (
+        <div className="mb-6 rounded-lg border border-gray-700 p-4">
+          <p>Predicted Winner: {prediction.predictedWinner || "N/A"}</p>
+          <p className="text-gray-400">
+            Home Win %: {prediction.homeWinProbability ?? "N/A"}
+          </p>
+          <p className="text-gray-400">
+            Away Win %: {prediction.awayWinProbability ?? "N/A"}
+          </p>
+          <p className="text-gray-400">
+            Projected Total: {prediction.projectedTotal ?? "N/A"}
+          </p>
+          <p className="text-gray-400">
+            Top Scorer: {prediction.topScorer || "N/A"}
+          </p>
+          <p className="text-gray-400">
+            Top Wicket Taker: {prediction.topWicketTaker || "N/A"}
+          </p>
+          <p className="text-gray-400">
+            Confidence: {prediction.confidence ?? "N/A"}%
+          </p>
+        </div>
+      ) : (
+        <p className="mb-6 text-gray-400">No prediction available.</p>
+      )}
+    </div>
   );
 }
