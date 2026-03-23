@@ -1,61 +1,18 @@
 const prisma = require("../config/prisma");
 
-const createTeam = async (req, res) => {
-  try {
-    const { name, shortName, logoUrl, country } = req.body;
-
-    if (!name || !shortName) {
-      return res.status(400).json({
-        success: false,
-        message: "name and shortName are required",
-      });
-    }
-
-    const existingTeam = await prisma.team.findUnique({
-      where: { shortName },
-    });
-
-    if (existingTeam) {
-      return res.status(409).json({
-        success: false,
-        message: "Team with this shortName already exists",
-      });
-    }
-
-    const team = await prisma.team.create({
-      data: {
-        name,
-        shortName,
-        logoUrl,
-        country,
-      },
-    });
-
-    res.status(201).json({
-      success: true,
-      data: team,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to create team",
-      error: error.message,
-    });
-  }
-};
-
 const getAllTeams = async (req, res) => {
   try {
     const teams = await prisma.team.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { name: "asc" },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
+      count: teams.length,
       data: teams,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch teams",
       error: error.message,
@@ -70,22 +27,8 @@ const getTeamById = async (req, res) => {
     const team = await prisma.team.findUnique({
       where: { id },
       include: {
-        players: true,
-        teamStats: true,
-        homeMatches: {
-          include: {
-            awayTeam: true,
-            venue: true,
-            tournament: true,
-          },
-        },
-        awayMatches: {
-          include: {
-            homeTeam: true,
-            venue: true,
-            tournament: true,
-          },
-        },
+        homeMatches: true,
+        awayMatches: true,
       },
     });
 
@@ -96,13 +39,12 @@ const getTeamById = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: team,
     });
   } catch (error) {
-    console.error("GET TEAM BY ID ERROR:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch team",
       error: error.message,
@@ -111,7 +53,6 @@ const getTeamById = async (req, res) => {
 };
 
 module.exports = {
-  createTeam,
   getAllTeams,
   getTeamById,
 };

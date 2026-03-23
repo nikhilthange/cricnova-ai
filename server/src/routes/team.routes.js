@@ -1,13 +1,11 @@
 const express = require("express");
+const router = express.Router();
+
 const {
-  createTeam,
   getAllTeams,
   getTeamById,
 } = require("../controllers/team.controller");
 
-const router = express.Router();
-
-router.post("/", createTeam);
 router.get("/", getAllTeams);
 router.get("/:id", getTeamById);
 

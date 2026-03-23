@@ -4,19 +4,43 @@ require("dotenv").config();
 
 const app = express();
 
-app.use(express.json());
+// Routes
+const matchRoutes = require("./routes/match.routes");
+const playerRoutes = require("./routes/player.routes");
+const teamRoutes = require("./routes/team.routes");
 
+// Middleware
+app.use(express.json());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: ["http://localhost:3000"],
     credentials: true,
   })
 );
 
-const matchRoutes = require("./routes/matches");
+// Test route
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "CricNova backend is running",
+  });
+});
+
+// API routes
+
 app.use("/api/matches", matchRoutes);
+app.use("/api/players", playerRoutes);
+app.use("/api/teams", teamRoutes);
+// 404 route
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

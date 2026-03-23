@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const axios = require("axios");
 
 const createMatch = async (req, res) => {
   try {
@@ -150,8 +151,87 @@ const getMatchById = async (req, res) => {
   }
 };
 
+const getLiveMatches = async (req, res) => {
+  try {
+    const apiKey = process.env.CRICKET_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        success: false,
+        message: "CRICKET_API_KEY is missing in environment variables",
+      });
+    }
+
+    const response = await axios.get("https://api.cricapi.com/v1/currentMatches", {
+      params: {
+        apikey: apiKey,
+        offset: 0,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: response.data.data || [],
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch live matches",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
+const getUpcomingMatches = async (req, res) => {
+  try {
+    const apiKey = process.env.CRICKET_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        success: false,
+        message: "CRICKET_API_KEY is missing in environment variables",
+      });
+    }
+
+    const response = await axios.get("https://api.cricapi.com/v1/cricScore", {
+      params: {
+        apikey: apiKey,
+      },
+    });
+
+    const allMatches = response.data?.data || [];
+
+    const upcomingMatches = allMatches.filter((match) => {
+      const statusText = (match.status || "").toLowerCase();
+      const msText = (match.ms || "").toLowerCase();
+
+      return (
+        statusText.includes("match not started") ||
+        statusText.includes("upcoming") ||
+        statusText.includes("fixture") ||
+        msText.includes("fixture") ||
+        msText.includes("upcoming")
+      );
+    });
+
+    res.status(200).json({
+      success: true,
+      count: upcomingMatches.length,
+      data: upcomingMatches,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch upcoming matches",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
 module.exports = {
   createMatch,
   getAllMatches,
   getMatchById,
+  getLiveMatches,
+  getUpcomingMatches,
 };

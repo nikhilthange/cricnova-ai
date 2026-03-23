@@ -1,39 +1,41 @@
-import { getAllTeams } from "../../services/teamService";
 import { getAllPlayers } from "../../services/playerService";
-import { getAllMatches } from "../../services/matchService";
+import {
+  getAllMatches,
+  getLiveMatches,
+  getUpcomingMatches,
+} from "../../services/matchService";
 import DashboardStatCard from "../../components/DashboardStatCard";
 import StatusChart from "../../components/StatusChart";
 import PageContainer from "../../components/PageContainer";
-import { getTopRunScorer, getTopWicketTaker } from "../../lib/homepageStats";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  let teams = [];
   let players = [];
   let matches = [];
+  let liveMatches = [];
+  let upcomingMatches = [];
   let error = null;
 
   try {
-    const [teamRes, playerRes, matchRes] = await Promise.all([
-      getAllTeams(),
+    const [playerRes, matchRes, liveRes, upcomingRes] = await Promise.all([
       getAllPlayers(),
       getAllMatches(),
+      getLiveMatches(),
+      getUpcomingMatches(),
     ]);
 
-    teams = teamRes.data || [];
     players = playerRes.data || [];
     matches = matchRes.data || [];
+    liveMatches = liveRes.data || [];
+    upcomingMatches = upcomingRes.data || [];
   } catch (err) {
     error = err.message;
   }
 
-  const liveMatches = matches.filter((m) => m.status === "LIVE");
-  const upcomingMatches = matches.filter((m) => m.status === "UPCOMING");
-  const completedMatches = matches.filter((m) => m.status === "COMPLETED");
-
-  const topRunScorer = getTopRunScorer(players);
-  const topWicketTaker = getTopWicketTaker(players);
+  const completedMatches = matches.filter(
+    (m) => m.status && m.status.toUpperCase() === "COMPLETED"
+  );
 
   const chartData = [
     { name: "LIVE", count: liveMatches.length },
@@ -50,24 +52,38 @@ export default async function DashboardPage() {
       ) : (
         <div className="space-y-8">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <DashboardStatCard title="Teams" value={teams.length} subtitle="Registered teams" />
-            <DashboardStatCard title="Players" value={players.length} subtitle="Tracked players" />
-            <DashboardStatCard title="Matches" value={matches.length} subtitle="Total matches" />
-            <DashboardStatCard title="Live Matches" value={liveMatches.length} subtitle="Currently live" />
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <DashboardStatCard title="Upcoming" value={upcomingMatches.length} subtitle="Scheduled matches" />
-            <DashboardStatCard title="Completed" value={completedMatches.length} subtitle="Finished matches" />
             <DashboardStatCard
-              title="Top Run Scorer"
-              value={topRunScorer ? topRunScorer.name : "N/A"}
-              subtitle={topRunScorer ? `${topRunScorer.totalRuns} runs` : "No stats yet"}
+              title="Players"
+              value={players.length}
+              subtitle="Tracked players"
             />
             <DashboardStatCard
-              title="Top Wicket Taker"
-              value={topWicketTaker ? topWicketTaker.name : "N/A"}
-              subtitle={topWicketTaker ? `${topWicketTaker.totalWickets} wickets` : "No stats yet"}
+              title="Matches"
+              value={matches.length}
+              subtitle="Database matches"
+            />
+            <DashboardStatCard
+              title="Live Matches"
+              value={liveMatches.length}
+              subtitle="Currently live"
+            />
+            <DashboardStatCard
+              title="Upcoming Matches"
+              value={upcomingMatches.length}
+              subtitle="Scheduled matches"
+            />
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <DashboardStatCard
+              title="Completed Matches"
+              value={completedMatches.length}
+              subtitle="Finished matches"
+            />
+            <DashboardStatCard
+              title="Total Match Coverage"
+              value={matches.length + liveMatches.length + upcomingMatches.length}
+              subtitle="DB + live + upcoming"
             />
           </div>
 

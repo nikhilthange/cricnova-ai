@@ -1,123 +1,72 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { use, useEffect, useState } from "react";
 import API_BASE_URL from "../../../services/api";
+import MatchDetailView from "../../../components/MatchDetailView";
+import AIPredictionPanel from "../../../components/AIPredictionPanel";
 
-export default function LiveMatchPage() {
-  const params = useParams();
-  const id = params?.id;
+export default function LiveMatchDetailPage({ params }) {
+  const resolvedParams = use(params);
+  const matchId = resolvedParams.id;
 
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    let intervalId;
 
-    fetch(`${API_BASE_URL}/live/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setMatch(data.data || null);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch live match:", error);
-        setLoading(false);
-      });
-  }, [id]);
+    const fetchMatch = async (isFirstLoad = false) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/matches/live`, {
+          cache: "no-store",
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch live matches");
+        }
+
+        const data = await res.json();
+        const allMatches = data.data || [];
+
+        const foundMatch = allMatches.find(
+          (m) => String(m.id) === String(matchId)
+        );
+
+        setMatch(foundMatch || null);
+      } catch (error) {
+        console.error("Failed to fetch live match details:", error);
+      } finally {
+        if (isFirstLoad) setLoading(false);
+      }
+    };
+
+    fetchMatch(true);
+
+    intervalId = setInterval(() => {
+      fetchMatch(false);
+    }, 20000);
+
+    return () => clearInterval(intervalId);
+  }, [matchId]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-black p-6 text-white">
-        <p>Loading live match...</p>
-      </div>
-    );
-  }
-
-  if (!match) {
-    return (
-      <div className="min-h-screen bg-black p-6 text-white">
-        <p>Live match not found.</p>
+        <h1 className="text-3xl font-bold">Live Match Details</h1>
+        <p className="mt-4">Loading match details...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black p-6 text-white">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{match.title}</h1>
-        <span className="rounded bg-red-600 px-3 py-1 text-sm font-bold">
-          LIVE
-        </span>
+    <div className="min-h-screen bg-black text-white">
+      <div className="bg-black px-6 pt-4 text-right text-xs text-gray-400">
+        Auto-refresh every 20 seconds
       </div>
 
-      <div className="mb-6 rounded-lg border border-gray-700 p-4">
-        <p className="text-3xl font-bold text-green-400">
-          {match.currentScore} ({match.overs})
-        </p>
-        <p className="mt-2 text-gray-400">Run Rate: {match.runRate}</p>
-        <p className="text-gray-400">Striker: {match.striker}</p>
-        <p className="text-gray-400">Non-Striker: {match.nonStriker}</p>
-        <p className="text-gray-400">Bowler: {match.bowler}</p>
-      </div>
-
-      <div className="mb-6 rounded-lg border border-green-500 bg-green-900/20 p-4">
-        <h2 className="mb-2 text-2xl font-semibold text-green-400">
-          Live AI Prediction
-        </h2>
-
-        <p className="text-xl font-semibold">
-          🏆 {match.livePrediction?.predictedWinner}
-        </p>
-
-        <p className="text-gray-300">
-          Win Probability: {match.livePrediction?.winProbability}%
-        </p>
-      </div>
-
-      <div className="mb-6 rounded-lg border border-gray-700 p-4">
-        <h2 className="mb-3 text-2xl font-semibold">Projected Scores</h2>
-
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-          <div className="rounded bg-gray-800 p-3 text-center">
-            <p className="text-sm text-gray-400">Powerplay</p>
-            <p className="text-xl font-bold">{match.projections?.powerplay}</p>
-          </div>
-
-          <div className="rounded bg-gray-800 p-3 text-center">
-            <p className="text-sm text-gray-400">10 Overs</p>
-            <p className="text-xl font-bold">{match.projections?.over10}</p>
-          </div>
-
-          <div className="rounded bg-gray-800 p-3 text-center">
-            <p className="text-sm text-gray-400">12 Overs</p>
-            <p className="text-xl font-bold">{match.projections?.over12}</p>
-          </div>
-
-          <div className="rounded bg-gray-800 p-3 text-center">
-            <p className="text-sm text-gray-400">15 Overs</p>
-            <p className="text-xl font-bold">{match.projections?.over15}</p>
-          </div>
-
-          <div className="rounded bg-gray-800 p-3 text-center">
-            <p className="text-sm text-gray-400">20 Overs</p>
-            <p className="text-xl font-bold">{match.projections?.over20}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-gray-700 p-4">
-        <h2 className="mb-3 text-2xl font-semibold">Recent Balls</h2>
-        <div className="flex flex-wrap gap-2">
-          {match.recentBalls?.map((ball, index) => (
-            <span
-              key={index}
-              className="rounded bg-gray-800 px-3 py-2 text-sm"
-            >
-              {ball}
-            </span>
-          ))}
-        </div>
+      <div className="mx-auto max-w-6xl space-y-6 px-6 pb-10">
+        <MatchDetailView match={match} type="live" />
+        <AIPredictionPanel match={match} />
       </div>
     </div>
   );

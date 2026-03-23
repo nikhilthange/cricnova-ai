@@ -1,7 +1,7 @@
 import API_BASE_URL from "./api";
 
-export const getAllPlayers = async () => {
-  const response = await fetch(`${API_BASE_URL}/players`, {
+export const getAllPlayers = async (offset = 0) => {
+  const response = await fetch(`${API_BASE_URL}/api/players?offset=${offset}`, {
     cache: "no-store",
   });
 
@@ -13,7 +13,7 @@ export const getAllPlayers = async () => {
 };
 
 export const getPlayerById = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/players/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/players/${id}`, {
     cache: "no-store",
   });
 

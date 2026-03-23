@@ -1,122 +1,79 @@
-const prisma = require("../config/prisma");
-
-const createPlayer = async (req, res) => {
-  try {
-    const {
-      name,
-      role,
-      battingStyle,
-      bowlingStyle,
-      nationality,
-      imageUrl,
-      teamId,
-    } = req.body;
-
-    if (!name || !role || !teamId) {
-      return res.status(400).json({
-        success: false,
-        message: "name, role and teamId are required",
-      });
-    }
-
-    const team = await prisma.team.findUnique({
-      where: { id: teamId },
-    });
-
-    if (!team) {
-      return res.status(404).json({
-        success: false,
-        message: "Team not found",
-      });
-    }
-
-    const player = await prisma.player.create({
-      data: {
-        name,
-        role,
-        battingStyle,
-        bowlingStyle,
-        nationality,
-        imageUrl,
-        teamId,
-      },
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Player created successfully",
-      data: player,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to create player",
-      error: error.message,
-    });
-  }
-};
+const axios = require("axios");
 
 const getAllPlayers = async (req, res) => {
   try {
-    const players = await prisma.player.findMany({
-      include: {
-        team: true,
-        playerStats: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const apiKey = process.env.CRICKET_API_KEY;
 
-    res.status(200).json({
-      success: true,
-      count: players.length,
-      data: players,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch players",
-      error: error.message,
-    });
-  }
-};
-const getPlayerById = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const player = await prisma.player.findUnique({
-      where: { id },
-      include: {
-        team: true,
-        playerStats: {
-          include: {
-            match: true,
-          },
-        },
-      },
-    });
-
-    if (!player) {
-      return res.status(404).json({
+    if (!apiKey) {
+      return res.status(500).json({
         success: false,
-        message: "Player not found",
+        message: "CRICKET_API_KEY is missing in environment variables",
       });
     }
 
-    res.status(200).json({
+    const offset = req.query.offset || 0;
+
+    const response = await axios.get("https://api.cricapi.com/v1/players", {
+      params: {
+        apikey: apiKey,
+        offset,
+      },
+    });
+
+    return res.status(200).json({
       success: true,
-      data: player,
+      data: response.data.data || [],
+      info: response.data.info || {},
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Failed to fetch player",
-      error: error.message,
+      message: "Failed to fetch players",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
+const getPlayerById = async (req, res) => {
+  try {
+    const apiKey = process.env.CRICKET_API_KEY;
+    const { id } = req.params;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        success: false,
+        message: "CRICKET_API_KEY is missing in environment variables",
+      });
+    }
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Player id is required",
+      });
+    }
+
+    const response = await axios.get("https://api.cricapi.com/v1/players_info", {
+      params: {
+        apikey: apiKey,
+        id,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: response.data.data || response.data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch player details",
+      error: error.response?.data || error.message,
     });
   }
 };
 
 module.exports = {
-  createPlayer,
   getAllPlayers,
   getPlayerById,
 };

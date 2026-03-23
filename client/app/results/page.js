@@ -10,7 +10,8 @@ export default async function ResultsPage() {
 
   try {
     const res = await getAllMatches();
-    matches = (res.data || []).filter((m) => m.status === "COMPLETED");
+    matches = (res.data || []).filter(
+  (m) => m.status && m.status.toUpperCase() === "COMPLETED");
   } catch (err) {
     error = err.message;
   }

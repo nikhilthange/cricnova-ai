@@ -9,7 +9,7 @@ export default function TeamsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/teams`)
+    fetch(`${API_BASE_URL}/api/teams`)
       .then((res) => res.json())
       .then((data) => {
         setTeams(data.data || []);

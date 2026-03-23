@@ -1,11 +1,17 @@
 const express = require("express");
+const router = express.Router();
+
 const {
   createMatch,
   getAllMatches,
   getMatchById,
+  getLiveMatches,
+  getUpcomingMatches,
 } = require("../controllers/match.controller");
 
-const router = express.Router();
+router.get("/live", getLiveMatches);
+router.get("/upcoming", getUpcomingMatches);
+
 
 router.post("/", createMatch);
 router.get("/", getAllMatches);
