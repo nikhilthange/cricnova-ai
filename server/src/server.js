@@ -11,9 +11,21 @@ const teamRoutes = require("./routes/team.routes");
 
 // Middleware
 app.use(express.json());
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://cricnova-ai.vercel.app",
+];
+
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -27,10 +39,10 @@ app.get("/", (req, res) => {
 });
 
 // API routes
-
 app.use("/api/matches", matchRoutes);
 app.use("/api/players", playerRoutes);
 app.use("/api/teams", teamRoutes);
+
 // 404 route
 app.use((req, res) => {
   res.status(404).json({

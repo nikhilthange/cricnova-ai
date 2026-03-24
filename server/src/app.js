@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 
@@ -13,26 +15,28 @@ const playerStatRoutes = require("./routes/playerStat.routes");
 const liveRoutes = require("./routes/live.routes");
 const upcomingPredictionRoutes = require("./routes/upcomingPrediction.routes");
 
-
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://cricnova-ai.vercel.app"],
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({ message: "CricNova AI backend running 🚀" });
 });
+
 app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "CricNova AI backend is healthy",
   });
 });
+
 app.use("/api/teams", teamRoutes);
 app.use("/api/players", playerRoutes);
 app.use("/api/tournaments", tournamentRoutes);
