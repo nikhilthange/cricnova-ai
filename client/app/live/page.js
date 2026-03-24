@@ -23,7 +23,20 @@ export default function LivePage() {
         }
 
         const data = await res.json();
-        setMatches(data.data || []);
+
+        const liveOnly = (data.data || []).filter((match) => {
+          const statusText = String(match.status || "").toLowerCase();
+          const msText = String(match.ms || "").toLowerCase();
+
+          return (
+            statusText.includes("live") ||
+            statusText.includes("in progress") ||
+            msText.includes("live") ||
+            msText.includes("in progress")
+          );
+        });
+
+        setMatches(liveOnly);
         setError("");
       } catch (err) {
         console.error("Failed to fetch live matches:", err);

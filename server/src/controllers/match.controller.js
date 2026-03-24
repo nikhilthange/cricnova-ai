@@ -169,9 +169,24 @@ const getLiveMatches = async (req, res) => {
       },
     });
 
+    const allMatches = response.data?.data || [];
+
+    const liveMatches = allMatches.filter((match) => {
+      const statusText = String(match.status || "").toLowerCase();
+      const msText = String(match.ms || "").toLowerCase();
+
+      return (
+        statusText.includes("live") ||
+        statusText.includes("in progress") ||
+        msText.includes("live") ||
+        msText.includes("in progress")
+      );
+    });
+
     res.status(200).json({
       success: true,
-      data: response.data.data || [],
+      count: liveMatches.length,
+      data: liveMatches,
     });
   } catch (error) {
     res.status(500).json({
