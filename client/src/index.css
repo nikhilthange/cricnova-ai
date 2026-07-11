@@ -6,19 +6,25 @@
     --text: #0f172a;
     --card: #ffffff;
     --border: #e2e8f0;
-    --primary: #2563eb;
+    --primary: #0f172a;
+    --secondary: #2563eb;
+    --accent: #22c55e;
     --primary-foreground: #ffffff;
-    --accent: #f1f5f9;
+    --secondary-foreground: #ffffff;
+    --accent-foreground: #ffffff;
   }
 
   .dark {
-    --bg: #020617; /* Slate 950 */
+    --bg: #020617;
     --text: #f8fafc;
-    --card: #0f172a; /* Slate 900 */
-    --border: #1e293b; /* Slate 800 */
-    --primary: #3b82f6;
+    --card: #0f172a; /* This is the primary color requested by the user, looks great as card bg in dark mode */
+    --border: #1e293b;
+    --primary: #0f172a;
+    --secondary: #2563eb;
+    --accent: #22c55e;
     --primary-foreground: #ffffff;
-    --accent: #1e293b;
+    --secondary-foreground: #ffffff;
+    --accent-foreground: #ffffff;
   }
 }
 
@@ -55,7 +61,7 @@ body {
 }
 
 .dark .glass-card {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
@@ -64,5 +70,5 @@ body {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-image: linear-gradient(to right, #3b82f6, #8b5cf6);
+  background-image: linear-gradient(to right, var(--secondary), var(--accent));
 }

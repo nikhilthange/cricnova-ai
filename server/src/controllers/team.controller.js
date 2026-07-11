@@ -1,58 +1,22 @@
-const prisma = require("../config/prisma");
+const Team = require('../models/Team');
 
-const getAllTeams = async (req, res) => {
+exports.getAllTeams = async (req, res, next) => {
   try {
-    const teams = await prisma.team.findMany({
-      orderBy: { name: "asc" },
-    });
-
-    return res.status(200).json({
-      success: true,
-      count: teams.length,
-      data: teams,
-    });
+    const teams = await Team.find().sort({ ranking: 1 });
+    res.json({ success: true, data: teams });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch teams",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-const getTeamById = async (req, res) => {
+exports.getTeamById = async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    const team = await prisma.team.findUnique({
-      where: { id },
-      include: {
-        homeMatches: true,
-        awayMatches: true,
-      },
-    });
-
+    const team = await Team.findById(req.params.id);
     if (!team) {
-      return res.status(404).json({
-        success: false,
-        message: "Team not found",
-      });
+      return res.status(404).json({ success: false, message: 'Team not found' });
     }
-
-    return res.status(200).json({
-      success: true,
-      data: team,
-    });
+    res.json({ success: true, data: team });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch team",
-      error: error.message,
-    });
+    next(error);
   }
-};
-
-module.exports = {
-  getAllTeams,
-  getTeamById,
 };

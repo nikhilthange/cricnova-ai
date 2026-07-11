@@ -1,0 +1,41 @@
+name: CricNova CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Client Dependencies
+        run: cd client && npm ci
+      - name: Build Client
+        run: cd client && npm run build
+
+  build-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Server Dependencies
+        run: cd server && npm ci
+      # Add tests here if available
+
+  # Deploy step can be added here for AWS (ECS/EC2)
+  # deploy:
+  #   needs: [build-client, build-server]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy to AWS
+  #       run: echo "Deployment script goes here"

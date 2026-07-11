@@ -1,18 +1,31 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
 import { ArrowUp } from "lucide-react";
 import Button from "./components/ui/Button";
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
+import { AuthProvider } from "./context/AuthContext";
 
-// Pages
-import Home from "./pages/Home";
-import LiveScores from "./pages/LiveScores";
-import Teams from "./pages/Teams";
-import Players from "./pages/Players";
-import MatchDetails from "./pages/MatchDetails";
+// Lazy Loaded Pages
+const Home = lazy(() => import("./pages/Home"));
+const LiveScores = lazy(() => import("./pages/LiveScores"));
+const Teams = lazy(() => import("./pages/Teams"));
+const Players = lazy(() => import("./pages/Players"));
+const MatchDetails = lazy(() => import("./pages/MatchDetails"));
+const News = lazy(() => import("./pages/News"));
+const Search = lazy(() => import("./pages/Search"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+
+// Loading fallback for Suspense
+const PageLoader = () => (
+  <div className="flex h-[60vh] items-center justify-center">
+    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 // Placeholder pages to ensure routing works for unfinished pages
 const Placeholder = ({ title }) => (
@@ -42,56 +55,59 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <div className="flex min-h-screen flex-col bg-background-dark dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-        <Navbar />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/live" element={<LiveScores />} />
-            <Route path="/matches/:id" element={<MatchDetails />} />
-            <Route path="/schedule" element={<Placeholder title="Schedule" />} />
-            <Route path="/series" element={<Placeholder title="Series" />} />
-            <Route path="/teams" element={<Teams />} />
-            <Route path="/players" element={<Players />} />
-            <Route path="/points-table" element={<Placeholder title="Points Table" />} />
-            <Route path="/rankings" element={<Placeholder title="Rankings" />} />
-            <Route path="/news" element={<Placeholder title="News" />} />
-            <Route path="/videos" element={<Placeholder title="Videos" />} />
-            <Route path="/search" element={<Placeholder title="Search" />} />
-            <Route path="/about" element={<Placeholder title="About" />} />
-            <Route path="*" element={<Placeholder title="404 Not Found" />} />
-          </Routes>
-        </main>
-        <Footer />
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans">
+          <Navbar />
+          <main className="flex-1">
+            <ErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/live" element={<LiveScores />} />
+                  <Route path="/matches/:id" element={<MatchDetails />} />
+                  <Route path="/schedule" element={<Placeholder title="Schedule" />} />
+                  <Route path="/series" element={<Placeholder title="Series" />} />
+                  <Route path="/teams" element={<Teams />} />
+                  <Route path="/players" element={<Players />} />
+                  <Route path="/points-table" element={<Placeholder title="Points Table" />} />
+                  <Route path="/rankings" element={<Placeholder title="Rankings" />} />
+                  <Route path="/news" element={<Placeholder title="News" />} />
+                  <Route path="/videos" element={<Placeholder title="Videos" />} />
+                  <Route path="/search" element={<Placeholder title="Search" />} />
+                  <Route path="/about" element={<Placeholder title="About" />} />
+                  
+                  {/* Auth Routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
 
-        {/* Scroll to top button */}
-        {showScrollTop && (
-          <Button
-            onClick={scrollToTop}
-            size="icon"
-            className="fixed bottom-6 right-6 rounded-full shadow-lg z-50 animate-in fade-in zoom-in"
-            aria-label="Scroll to top"
-          >
-            <ArrowUp className="w-5 h-5" />
-          </Button>
-        )}
-        
-        {/* Toast notifications */}
-        <ToastContainer
-          position="bottom-left"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-      </div>
-    </BrowserRouter>
+                  <Route path="*" element={<Placeholder title="404 Not Found" />} />
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
+          </main>
+          <Footer />
+
+          {/* Scroll to top button */}
+          {showScrollTop && (
+            <Button
+              onClick={scrollToTop}
+              size="icon"
+              className="fixed bottom-6 right-6 rounded-full shadow-lg z-50 animate-in fade-in zoom-in"
+              aria-label="Scroll to top"
+            >
+              <ArrowUp className="w-5 h-5" />
+            </Button>
+          )}
+          
+          <ToastContainer
+            position="bottom-left"
+            autoClose={3000}
+            theme="colored"
+          />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

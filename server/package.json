@@ -7,16 +7,17 @@
     "start": "node src/server.js"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.5.0",
-    "@prisma/client": "^7.5.0",
     "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
+    "express-rate-limit": "^8.5.2",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.20.0",
-    "prisma": "^7.5.0"
+    "mongoose": "^9.7.4",
+    "morgan": "^1.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

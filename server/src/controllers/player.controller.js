@@ -1,79 +1,22 @@
-const axios = require("axios");
+const Player = require('../models/Player');
 
-const getAllPlayers = async (req, res) => {
+exports.getAllPlayers = async (req, res, next) => {
   try {
-    const apiKey = process.env.CRICKET_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({
-        success: false,
-        message: "CRICKET_API_KEY is missing in environment variables",
-      });
-    }
-
-    const offset = req.query.offset || 0;
-
-    const response = await axios.get("https://api.cricapi.com/v1/players", {
-      params: {
-        apikey: apiKey,
-        offset,
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      data: response.data.data || [],
-      info: response.data.info || {},
-    });
+    const players = await Player.find().populate('teamId', 'name');
+    res.json({ success: true, data: players });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch players",
-      error: error.response?.data || error.message,
-    });
+    next(error);
   }
 };
 
-const getPlayerById = async (req, res) => {
+exports.getPlayerById = async (req, res, next) => {
   try {
-    const apiKey = process.env.CRICKET_API_KEY;
-    const { id } = req.params;
-
-    if (!apiKey) {
-      return res.status(500).json({
-        success: false,
-        message: "CRICKET_API_KEY is missing in environment variables",
-      });
+    const player = await Player.findById(req.params.id).populate('teamId', 'name');
+    if (!player) {
+      return res.status(404).json({ success: false, message: 'Player not found' });
     }
-
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "Player id is required",
-      });
-    }
-
-    const response = await axios.get("https://api.cricapi.com/v1/players_info", {
-      params: {
-        apikey: apiKey,
-        id,
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      data: response.data.data || response.data,
-    });
+    res.json({ success: true, data: player });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch player details",
-      error: error.response?.data || error.message,
-    });
+    next(error);
   }
-};
-
-module.exports = {
-  getAllPlayers,
-  getPlayerById,
 };

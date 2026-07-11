@@ -1,252 +1,51 @@
-const prisma = require("../config/prisma");
-const axios = require("axios");
+const Match = require('../models/Match');
 
-const createMatch = async (req, res) => {
+exports.getAllMatches = async (req, res, next) => {
   try {
-    const {
-      title,
-      status,
-      matchDate,
-      tossWinner,
-      tossDecision,
-      resultSummary,
-      homeTeamId,
-      awayTeamId,
-      venueId,
-      tournamentId,
-    } = req.body;
-
-    if (!title || !matchDate || !homeTeamId || !awayTeamId || !venueId || !tournamentId) {
-      return res.status(400).json({
-        success: false,
-        message: "title, matchDate, homeTeamId, awayTeamId, venueId and tournamentId are required",
-      });
-    }
-
-    if (homeTeamId === awayTeamId) {
-      return res.status(400).json({
-        success: false,
-        message: "homeTeamId and awayTeamId cannot be the same",
-      });
-    }
-
-    const [homeTeam, awayTeam, venue, tournament] = await Promise.all([
-      prisma.team.findUnique({ where: { id: homeTeamId } }),
-      prisma.team.findUnique({ where: { id: awayTeamId } }),
-      prisma.venue.findUnique({ where: { id: venueId } }),
-      prisma.tournament.findUnique({ where: { id: tournamentId } }),
-    ]);
-
-    if (!homeTeam || !awayTeam || !venue || !tournament) {
-      return res.status(404).json({
-        success: false,
-        message: "One or more related records not found",
-      });
-    }
-
-    const match = await prisma.match.create({
-      data: {
-        title,
-        status,
-        matchDate: new Date(matchDate),
-        tossWinner,
-        tossDecision,
-        resultSummary,
-        homeTeamId,
-        awayTeamId,
-        venueId,
-        tournamentId,
-      },
-      include: {
-        homeTeam: true,
-        awayTeam: true,
-        venue: true,
-        tournament: true,
-      },
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Match created successfully",
-      data: match,
-    });
+    const matches = await Match.find()
+      .populate('team1', 'name code logo')
+      .populate('team2', 'name code logo')
+      .sort({ date: -1 });
+    res.json({ success: true, data: matches });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to create match",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-const getAllMatches = async (req, res) => {
+exports.getMatchById = async (req, res, next) => {
   try {
-    const matches = await prisma.match.findMany({
-      include: {
-        homeTeam: true,
-        awayTeam: true,
-        venue: true,
-        tournament: true,
-      },
-      orderBy: { matchDate: "asc" },
-    });
-
-    res.status(200).json({
-      success: true,
-      count: matches.length,
-      data: matches,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch matches",
-      error: error.message,
-    });
-  }
-};
-
-const getMatchById = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const match = await prisma.match.findUnique({
-      where: { id },
-      include: {
-        homeTeam: true,
-        awayTeam: true,
-        venue: true,
-        tournament: true,
-        innings: true,
-        teamStats: {
-          include: {
-            team: true,
-          },
-        },
-        playerStats: {
-          include: {
-            player: true,
-          },
-        },
-        predictions: true,
-      },
-    });
-
+    const match = await Match.findById(req.params.id)
+      .populate('team1', 'name code logo')
+      .populate('team2', 'name code logo');
+    
     if (!match) {
-      return res.status(404).json({
-        success: false,
-        message: "Match not found",
-      });
+      return res.status(404).json({ success: false, message: 'Match not found' });
     }
-
-    res.status(200).json({
-      success: true,
-      data: match,
-    });
+    res.json({ success: true, data: match });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch match",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-const getLiveMatches = async (req, res) => {
+exports.getLiveMatches = async (req, res, next) => {
   try {
-    const apiKey = process.env.CRICKET_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({
-        success: false,
-        message: "CRICKET_API_KEY is missing in environment variables",
-      });
-    }
-
-    const response = await axios.get("https://api.cricapi.com/v1/currentMatches", {
-      params: {
-        apikey: apiKey,
-        offset: 0,
-      },
-    });
-
-    const allMatches = response.data?.data || [];
-
-    const liveMatches = allMatches.filter((match) => {
-      const statusText = String(match.status || "").toLowerCase();
-      const msText = String(match.ms || "").toLowerCase();
-
-      return (
-        statusText.includes("live") ||
-        statusText.includes("in progress") ||
-        msText.includes("live") ||
-        msText.includes("in progress")
-      );
-    });
-
-    res.status(200).json({
-      success: true,
-      count: liveMatches.length,
-      data: liveMatches,
-    });
+    const matches = await Match.find({ status: 'LIVE' })
+      .populate('team1', 'name code logo')
+      .populate('team2', 'name code logo');
+    res.json({ success: true, data: matches });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch live matches",
-      error: error.response?.data || error.message,
-    });
+    next(error);
   }
 };
 
-const getUpcomingMatches = async (req, res) => {
+exports.getUpcomingMatches = async (req, res, next) => {
   try {
-    const apiKey = process.env.CRICKET_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({
-        success: false,
-        message: "CRICKET_API_KEY is missing in environment variables",
-      });
-    }
-
-    const response = await axios.get("https://api.cricapi.com/v1/cricScore", {
-      params: {
-        apikey: apiKey,
-      },
-    });
-
-    const allMatches = response.data?.data || [];
-
-    const upcomingMatches = allMatches.filter((match) => {
-      const statusText = (match.status || "").toLowerCase();
-      const msText = (match.ms || "").toLowerCase();
-
-      return (
-        statusText.includes("match not started") ||
-        statusText.includes("upcoming") ||
-        statusText.includes("fixture") ||
-        msText.includes("fixture") ||
-        msText.includes("upcoming")
-      );
-    });
-
-    res.status(200).json({
-      success: true,
-      count: upcomingMatches.length,
-      data: upcomingMatches,
-    });
+    const matches = await Match.find({ status: 'UPCOMING' })
+      .populate('team1', 'name code logo')
+      .populate('team2', 'name code logo')
+      .sort({ date: 1 });
+    res.json({ success: true, data: matches });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch upcoming matches",
-      error: error.response?.data || error.message,
-    });
+    next(error);
   }
-};
-
-module.exports = {
-  createMatch,
-  getAllMatches,
-  getMatchById,
-  getLiveMatches,
-  getUpcomingMatches,
 };
