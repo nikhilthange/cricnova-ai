@@ -1,10 +1,12 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
-const morgan = require("morgan");
-const connectDB = require("./config/db");
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
+import connectDB from './config/db';
 
 // Connect to Database
 connectDB();
@@ -46,11 +48,11 @@ app.get("/health", (req, res) => {
 });
 
 // Import Routes
-const authRoutes = require("./routes/auth.routes");
+import authRoutes from "./routes/auth.routes";
 app.use("/api/auth", authRoutes);
 
 // Error Handler Middleware
-app.use((err, req, res, next) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(err.statusCode || 500).json({
     success: false,
@@ -59,4 +61,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-module.exports = app;
+export default app;

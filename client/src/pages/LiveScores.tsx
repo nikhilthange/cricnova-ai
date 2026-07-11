@@ -5,7 +5,7 @@ import { Skeleton } from "../components/ui/Skeleton";
 import { Activity } from "lucide-react";
 
 export default function LiveScores() {
-  const [matches, setMatches] = useState([]);
+  const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function LiveScores() {
         {loading ? (
           Array(4).fill(0).map((_, i) => <Skeleton key={i} className="h-[200px]" />)
         ) : matches.length > 0 ? (
-          matches.map(match => <MatchCard key={match.id} match={match} />)
+          matches.map((match: any) => <MatchCard key={match._id} match={match} />)
         ) : (
           <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
             <Activity className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />

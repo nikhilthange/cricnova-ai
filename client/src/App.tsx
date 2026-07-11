@@ -14,7 +14,7 @@ const Home = lazy(() => import("./pages/Home"));
 const LiveScores = lazy(() => import("./pages/LiveScores"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Players = lazy(() => import("./pages/Players"));
-const MatchDetails = lazy(() => import("./pages/MatchDetails"));
+const MatchCenter = lazy(() => import("./pages/MatchCenter"));
 const News = lazy(() => import("./pages/News"));
 const Search = lazy(() => import("./pages/Search"));
 const Login = lazy(() => import("./pages/Login"));
@@ -39,6 +39,10 @@ const Placeholder = ({ title }) => (
   </div>
 );
 
+import { QueryProvider } from "./context/QueryProvider";
+import { SocketProvider } from "./context/SocketContext";
+import { AIChatbot } from "./components/ui/AIChatbot";
+
 function App() {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -55,9 +59,11 @@ function App() {
   };
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans">
+    <QueryProvider>
+      <SocketProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans">
           <Navbar />
           <main className="flex-1">
             <ErrorBoundary>
@@ -65,7 +71,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/live" element={<LiveScores />} />
-                  <Route path="/matches/:id" element={<MatchDetails />} />
+                  <Route path="/matches/:id" element={<MatchCenter />} />
                   <Route path="/schedule" element={<Placeholder title="Schedule" />} />
                   <Route path="/series" element={<Placeholder title="Series" />} />
                   <Route path="/teams" element={<Teams />} />
@@ -100,6 +106,9 @@ function App() {
             </Button>
           )}
           
+          {/* AI Chatbot */}
+          <AIChatbot />
+          
           <ToastContainer
             position="bottom-left"
             autoClose={3000}
@@ -108,6 +117,8 @@ function App() {
         </div>
       </BrowserRouter>
     </AuthProvider>
+    </SocketProvider>
+    </QueryProvider>
   );
 }
 

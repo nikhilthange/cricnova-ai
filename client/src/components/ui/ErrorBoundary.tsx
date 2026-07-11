@@ -1,8 +1,8 @@
 import React from "react";
 import Button from "./Button";
 
-export class ErrorBoundary extends React.Component {
-  constructor(props) {
+export class ErrorBoundary extends React.Component<any, { hasError: boolean, error: any }> {
+  constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null };
   }

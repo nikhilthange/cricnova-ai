@@ -5,17 +5,13 @@ import Button from "./Button";
 import { Star } from "lucide-react";
 import { cn } from "../../lib/utils";
 
-export default function TeamCard({ team }) {
-  const { favoriteTeams, addFavoriteTeam, removeFavoriteTeam } = useStore();
-  const isFavorite = favoriteTeams.includes(team.id);
+export default function TeamCard({ team }: { team: any }) {
+  const { favoriteTeams, toggleFavoriteTeam } = useStore();
+  const isFavorite = favoriteTeams.find((t: any) => t._id === team._id);
 
-  const toggleFavorite = (e) => {
+  const toggleFavorite = (e: any) => {
     e.preventDefault();
-    if (isFavorite) {
-      removeFavoriteTeam(team.id);
-    } else {
-      addFavoriteTeam(team.id);
-    }
+    toggleFavoriteTeam(team);
   };
 
   return (

@@ -1,7 +1,12 @@
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
 import { cn } from "../../lib/utils";
 
-const Button = forwardRef(
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  size?: "default" | "sm" | "lg" | "icon";
+}
+
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "default", children, ...props }, ref) => {
     const variants = {
       primary: "bg-primary text-primary-foreground hover:bg-blue-600 shadow-lg shadow-blue-500/30",
