@@ -48,8 +48,8 @@ app.get("/health", (req, res) => {
 });
 
 // Import Routes
-import authRoutes from "./routes/auth.routes";
-import matchRoutes from "./routes/match.routes";
+const authRoutes = require("./routes/auth.routes");
+const matchRoutes = require("./routes/match.routes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/matches", matchRoutes);

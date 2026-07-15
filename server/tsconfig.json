@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
+    "moduleDetection": "force",
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": false,
@@ -10,5 +11,11 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": [
+    "src/services/match.service.ts",
+    "src/services/player.service.ts",
+    "src/services/prediction.service.ts",
+    "src/generated"
+  ]
 }
