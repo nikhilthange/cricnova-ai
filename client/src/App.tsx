@@ -15,6 +15,8 @@ const LiveScores = lazy(() => import("./pages/LiveScores"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Players = lazy(() => import("./pages/Players"));
 const MatchCenter = lazy(() => import("./pages/MatchCenter"));
+const Schedule = lazy(() => import("./pages/Schedule"));
+const PointsTable = lazy(() => import("./pages/PointsTable"));
 const News = lazy(() => import("./pages/News"));
 const Search = lazy(() => import("./pages/Search"));
 const Login = lazy(() => import("./pages/Login"));
@@ -72,11 +74,11 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/live" element={<LiveScores />} />
                   <Route path="/matches/:id" element={<MatchCenter />} />
-                  <Route path="/schedule" element={<Placeholder title="Schedule" />} />
+                  <Route path="/schedule" element={<Schedule />} />
                   <Route path="/series" element={<Placeholder title="Series" />} />
                   <Route path="/teams" element={<Teams />} />
                   <Route path="/players" element={<Players />} />
-                  <Route path="/points-table" element={<Placeholder title="Points Table" />} />
+                  <Route path="/points-table" element={<PointsTable />} />
                   <Route path="/rankings" element={<Placeholder title="Rankings" />} />
                   <Route path="/news" element={<Placeholder title="News" />} />
                   <Route path="/videos" element={<Placeholder title="Videos" />} />
