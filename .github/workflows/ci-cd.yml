@@ -14,9 +14,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
       - name: Install Client Dependencies
-        run: cd client && npm ci
+        run: cd client && npm install
       - name: Build Client
         run: cd client && npm run build
 
@@ -27,9 +27,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
       - name: Install Server Dependencies
-        run: cd server && npm ci
+        run: cd server && npm install
       # Add tests here if available
 
   # Deploy step can be added here for AWS (ECS/EC2)
