@@ -12,7 +12,7 @@ export default function LiveScores() {
     async function loadData() {
       try {
         const liveRes = await getLiveMatches();
-        setMatches(liveRes.data || []);
+        setMatches(liveRes || []);
       } catch (error) {
         console.error("Failed to load live matches", error);
       } finally {

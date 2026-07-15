@@ -13,7 +13,7 @@ export default function Players() {
     async function loadData() {
       try {
         const res = await getAllPlayers();
-        setPlayers(res.data || []);
+        setPlayers(res || []);
       } catch (error) {
         console.error("Failed to load players", error);
       } finally {
