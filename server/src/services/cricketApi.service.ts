@@ -17,6 +17,13 @@ const getMatches = async () => {
   return response.data;
 };
 
+const getSeriesList = async () => {
+  const response = await axios.get(`${BASE_URL}/series`, {
+    params: { apikey: API_KEY, offset: 0 },
+  });
+  return response.data;
+};
+
 const getSeriesStandings = async (seriesId) => {
   const response = await axios.get(`${BASE_URL}/series_standings`, {
     params: { apikey: API_KEY, id: seriesId },
@@ -48,6 +55,7 @@ const getMatchScorecard = async (matchId) => {
 module.exports = {
   getCurrentMatches,
   getMatches,
+  getSeriesList,
   getSeriesStandings,
   getPlayers,
   getMatchInfo,

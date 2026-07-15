@@ -7,6 +7,33 @@ const cricketApi = require("../services/cricketApi.service");
 // Note: To make this dynamic, you'd fetch /series first and pick one.
 const DEFAULT_SERIES_ID = "c75f8952-74d4-416f-b7b4-7da4b4e3ae6e"; 
 
+router.get("/", async (req, res, next) => {
+  try {
+    const apiResponse = await cricketApi.getSeriesList();
+    if (!apiResponse || !apiResponse.data) {
+      return res.json([]);
+    }
+    
+    // Filter to show upcoming/ongoing series, but we can just return what API gives
+    const seriesList = apiResponse.data.map(series => ({
+      id: series.id,
+      name: series.name,
+      startDate: series.startDate,
+      endDate: series.endDate,
+      matches: series.matches,
+      odi: series.odi,
+      t20: series.t20,
+      test: series.test,
+      squads: series.squads
+    }));
+    
+    res.json(seriesList);
+  } catch (error) {
+    console.error("CricAPI Error (Series List):", error);
+    next(error);
+  }
+});
+
 router.get("/standings", async (req, res, next) => {
   try {
     const seriesId = req.query.id || DEFAULT_SERIES_ID;
