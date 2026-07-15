@@ -49,7 +49,10 @@ app.get("/health", (req, res) => {
 
 // Import Routes
 import authRoutes from "./routes/auth.routes";
+import matchRoutes from "./routes/match.routes";
+
 app.use("/api/auth", authRoutes);
+app.use("/api/matches", matchRoutes);
 
 // Error Handler Middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
