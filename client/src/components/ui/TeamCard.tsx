@@ -27,8 +27,12 @@ export default function TeamCard({ team }: { team: any }) {
         </Button>
       </div>
       <CardContent className="pt-12 pb-6 relative text-center">
-        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full border-4 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-3xl shadow-sm">
-          {team.logo || "🏏"}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full border-4 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-3xl shadow-sm overflow-hidden">
+          {team.logo?.startsWith('http') ? (
+            <img src={team.logo} alt={team.name} className="w-full h-full object-contain p-2" />
+          ) : (
+            team.logo || "🏏"
+          )}
         </div>
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{team.name}</h3>
         <p className="text-sm font-medium text-slate-500 mb-4">{team.code}</p>

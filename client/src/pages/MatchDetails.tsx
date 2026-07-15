@@ -70,7 +70,11 @@ export default function MatchDetails() {
             
             {/* Team 1 */}
             <div className="flex flex-col items-center md:items-start flex-1">
-              <div className="text-6xl mb-4">{match.team1?.logo || "🏏"}</div>
+              {match.team1?.logo?.startsWith('http') ? (
+                <img src={match.team1.logo} alt={match.team1?.code} className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-full bg-slate-100 dark:bg-slate-800 p-2 mx-auto mb-4" />
+              ) : (
+                <div className="text-6xl mb-4">{match.team1?.logo || "🏏"}</div>
+              )}
               <h2 className="text-2xl md:text-3xl font-bold mb-2">{match.team1?.name || match.team1}</h2>
               <div className="text-4xl md:text-5xl font-black text-blue-200">{match.score1}</div>
             </div>
@@ -89,7 +93,11 @@ export default function MatchDetails() {
 
             {/* Team 2 */}
             <div className="flex flex-col items-center md:items-end flex-1">
-              <div className="text-6xl mb-4">{match.team2?.logo || "🏏"}</div>
+              {match.team2?.logo?.startsWith('http') ? (
+                <img src={match.team2.logo} alt={match.team2?.code} className="w-16 h-16 md:w-20 md:h-20 object-contain rounded-full bg-slate-100 dark:bg-slate-800 p-2 mx-auto mb-4" />
+              ) : (
+                <div className="text-6xl mb-4">{match.team2?.logo || "🏏"}</div>
+              )}
               <h2 className="text-2xl md:text-3xl font-bold mb-2">{match.team2?.name || match.team2}</h2>
               <div className="text-4xl md:text-5xl font-black text-purple-200">{match.score2}</div>
             </div>
