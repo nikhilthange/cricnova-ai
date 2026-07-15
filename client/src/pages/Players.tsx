@@ -1,107 +1,82 @@
 import { useState, useEffect } from "react";
-import { getAllPlayers } from "../services/playerService";
-import { Card, CardContent } from "../components/ui/Card";
-import { Skeleton } from "../components/ui/Skeleton";
-import { Users, Search } from "lucide-react";
+import { Users, Search, Loader2 } from "lucide-react";
+import PlayerCard from "../components/ui/PlayerCard";
+
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Players() {
   const [players, setPlayers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearch, setActiveSearch] = useState("Virat Kohli"); // Default search
 
   useEffect(() => {
-    async function loadData() {
+    const fetchPlayers = async () => {
+      setIsLoading(true);
       try {
-        const res = await getAllPlayers();
-        setPlayers(res || []);
+        const response = await fetch(`${API_URL}/api/players?search=${encodeURIComponent(activeSearch)}`);
+        const data = await response.json();
+        setPlayers(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error("Failed to load players", error);
+        console.error("Failed to fetch players:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
-    }
-    loadData();
-  }, []);
+    };
+    fetchPlayers();
+  }, [activeSearch]);
 
-  const filteredPlayers = players.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setActiveSearch(searchQuery.trim());
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-3 text-slate-900 dark:text-white">
-            <Users className="text-blue-500 w-8 h-8" /> Players
+            <Users className="text-indigo-500 w-8 h-8" /> Player Search
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2">
-            Explore player profiles, stats, and rankings.
+            Search for your favorite cricket players to view their stats.
           </p>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-          <input 
-            type="text" 
-            placeholder="Search players..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 pr-4 py-2 w-full md:w-64 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+        
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="relative w-full md:w-72">
+          <input
+            type="text"
+            placeholder="Search players (e.g. Dhoni)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
           />
-        </div>
+          <Search className="absolute left-3 top-2.5 w-5 h-5 text-slate-400" />
+        </form>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {loading ? (
-          Array(8).fill(0).map((_, i) => <Skeleton key={i} className="h-[250px]" />)
-        ) : filteredPlayers.length > 0 ? (
-          filteredPlayers.map(player => (
-            <Card key={player.id} className="overflow-hidden group hover:shadow-lg transition-all duration-300 cursor-pointer">
-              <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-700 relative">
-                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full border-4 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-                  <span className="text-3xl">👤</span>
-                </div>
-              </div>
-              <CardContent className="pt-14 pb-6 text-center">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{player.name}</h3>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-4">{player.country} • {player.role}</p>
-                
-                <div className="grid grid-cols-3 gap-2 border-t border-slate-100 dark:border-slate-800 pt-4">
-                  <div>
-                    <div className="text-xs text-slate-500">Matches</div>
-                    <div className="font-semibold text-slate-900 dark:text-white">{player.matches}</div>
-                  </div>
-                  {player.runs ? (
-                    <div>
-                      <div className="text-xs text-slate-500">Runs</div>
-                      <div className="font-semibold text-slate-900 dark:text-white">{player.runs}</div>
-                    </div>
-                  ) : null}
-                  {player.wickets ? (
-                    <div>
-                      <div className="text-xs text-slate-500">Wickets</div>
-                      <div className="font-semibold text-slate-900 dark:text-white">{player.wickets}</div>
-                    </div>
-                  ) : null}
-                  {player.average ? (
-                    <div>
-                      <div className="text-xs text-slate-500">Avg</div>
-                      <div className="font-semibold text-slate-900 dark:text-white">{player.average}</div>
-                    </div>
-                  ) : null}
-                  {player.economy ? (
-                    <div>
-                      <div className="text-xs text-slate-500">Econ</div>
-                      <div className="font-semibold text-slate-900 dark:text-white">{player.economy}</div>
-                    </div>
-                  ) : null}
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="col-span-full p-8 text-center text-slate-500">
-            No players found matching "{search}".
-          </div>
-        )}
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {players.length > 0 ? (
+            players.map((player: any) => (
+              <PlayerCard key={player.id} player={player} />
+            ))
+          ) : (
+            <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+              <Users className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No Players Found</h3>
+              <p className="text-slate-500 dark:text-slate-400">Try searching for a different name like "Rohit Sharma" or "Steve Smith".</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

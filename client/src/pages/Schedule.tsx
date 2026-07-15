@@ -1,65 +1,36 @@
-import { useState } from "react";
-import { Calendar, Filter } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar, Filter, Loader2 } from "lucide-react";
 import MatchCard from "../components/ui/MatchCard";
 import Button from "../components/ui/Button";
 
-// Mock data for upcoming matches
-const mockUpcomingMatches = [
-  {
-    id: 101,
-    team1: { name: "India", code: "IND", logo: "🇮🇳" },
-    team2: { name: "Pakistan", code: "PAK", logo: "🇵🇰" },
-    status: "UPCOMING",
-    date: "Tomorrow, 14:00 GMT",
-    venue: "Wanderers, Johannesburg",
-    format: "T20"
-  },
-  {
-    id: 102,
-    team1: { name: "Australia", code: "AUS", logo: "🇦🇺" },
-    team2: { name: "England", code: "ENG", logo: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
-    status: "UPCOMING",
-    date: "Oct 25, 09:30 GMT",
-    venue: "MCG, Melbourne",
-    format: "ODI"
-  },
-  {
-    id: 103,
-    team1: { name: "South Africa", code: "SA", logo: "🇿🇦" },
-    team2: { name: "New Zealand", code: "NZ", logo: "🇳🇿" },
-    status: "UPCOMING",
-    date: "Oct 26, 10:00 GMT",
-    venue: "Newlands, Cape Town",
-    format: "Test"
-  },
-  {
-    id: 104,
-    team1: { name: "India", code: "IND", logo: "🇮🇳" },
-    team2: { name: "Sri Lanka", code: "SL", logo: "🇱🇰" },
-    status: "UPCOMING",
-    date: "Oct 28, 13:30 GMT",
-    venue: "Wankhede Stadium, Mumbai",
-    format: "T20"
-  },
-  {
-    id: 105,
-    team1: { name: "West Indies", code: "WI", logo: "🌴" },
-    team2: { name: "Bangladesh", code: "BAN", logo: "🇧🇩" },
-    status: "UPCOMING",
-    date: "Oct 29, 18:00 GMT",
-    venue: "Kensington Oval, Barbados",
-    format: "T20"
-  }
-];
+// Assuming you have an api setup, otherwise we fetch directly from VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Schedule() {
   const [activeTab, setActiveTab] = useState("All");
+  const [matches, setMatches] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const tabs = ["All", "T20", "ODI", "Test"];
 
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/matches/upcoming`);
+        const data = await response.json();
+        setMatches(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch schedule:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUpcoming();
+  }, []);
+
   const filteredMatches = activeTab === "All" 
-    ? mockUpcomingMatches 
-    : mockUpcomingMatches.filter(m => m.format === activeTab);
+    ? matches 
+    : matches.filter((m: any) => m.format === activeTab);
 
   return (
     <div className="container mx-auto px-4 py-8 animate-in fade-in duration-500">
@@ -90,19 +61,25 @@ export default function Schedule() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMatches.length > 0 ? (
-          filteredMatches.map(match => (
-            <MatchCard key={match.id} match={match} />
-          ))
-        ) : (
-          <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <Calendar className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No Matches Found</h3>
-            <p className="text-slate-500 dark:text-slate-400">There are no scheduled matches for the selected format.</p>
-          </div>
-        )}
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredMatches.length > 0 ? (
+            filteredMatches.map((match: any) => (
+              <MatchCard key={match.id} match={match} />
+            ))
+          ) : (
+            <div className="col-span-full p-12 text-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+              <Calendar className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No Matches Found</h3>
+              <p className="text-slate-500 dark:text-slate-400">There are no scheduled matches for the selected format.</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

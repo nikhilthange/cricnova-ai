@@ -50,9 +50,13 @@ app.get("/health", (req, res) => {
 // Import Routes
 const authRoutes = require("./routes/auth.routes");
 const matchRoutes = require("./routes/match.routes");
+const seriesRoutes = require("./routes/series.routes");
+const playerRoutes = require("./routes/player.routes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/matches", matchRoutes);
+app.use("/api/series", seriesRoutes);
+app.use("/api/players", playerRoutes);
 
 // Error Handler Middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

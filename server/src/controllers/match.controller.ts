@@ -70,12 +70,36 @@ exports.getLiveMatches = async (req, res, next) => {
 
 exports.getUpcomingMatches = async (req, res, next) => {
   try {
-    const matches = await Match.find({ status: 'UPCOMING' })
-      .populate('team1', 'name code logo')
-      .populate('team2', 'name code logo')
-      .sort({ date: 1 });
-    res.json({ success: true, data: matches });
+    const apiResponse = await cricketApi.getMatches();
+    
+    if (!apiResponse || !apiResponse.data) {
+      return res.json([]);
+    }
+
+    const upcomingMatches = apiResponse.data
+      .filter(match => !match.matchStarted)
+      .map(match => ({
+        _id: match.id,
+        id: match.id,
+        team1: { 
+          name: match.teamInfo?.[0]?.name || match.teams?.[0] || "Team 1", 
+          code: match.teamInfo?.[0]?.shortname || match.teams?.[0]?.substring(0,3) || "T1", 
+          logo: match.teamInfo?.[0]?.img || "🏏" 
+        },
+        team2: { 
+          name: match.teamInfo?.[1]?.name || match.teams?.[1] || "Team 2", 
+          code: match.teamInfo?.[1]?.shortname || match.teams?.[1]?.substring(0,3) || "T2", 
+          logo: match.teamInfo?.[1]?.img || "🏏" 
+        },
+        status: 'UPCOMING',
+        venue: match.venue || "TBD",
+        date: new Date(match.dateTimeGMT).toLocaleString(),
+        format: match.matchType?.toUpperCase() || "T20"
+      }));
+
+    res.json(upcomingMatches);
   } catch (error) {
+    console.error("CricAPI Error (Upcoming):", error);
     next(error);
   }
 };
