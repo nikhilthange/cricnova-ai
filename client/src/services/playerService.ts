@@ -12,7 +12,7 @@ export const getAllPlayers = async () => {
     return response.data;
   } catch (error) {
     console.warn("API failed, using mock data");
-    return { data: mockPlayers };
+    return mockPlayers;
   }
 };
 
@@ -21,6 +21,6 @@ export const getPlayerById = async (id) => {
     const response = await api.get(`/api/players/${id}`);
     return response.data;
   } catch (error) {
-    return { data: mockPlayers.find(p => p.id == id) || mockPlayers[0] };
+    return mockPlayers.find(p => p.id == id) || mockPlayers[0];
   }
 };

@@ -39,7 +39,7 @@ export const getAllMatches = async () => {
     return response.data;
   } catch (error) {
     console.warn("API failed, using mock data");
-    return { data: mockMatches };
+    return mockMatches;
   }
 };
 
@@ -48,7 +48,7 @@ export const getMatchById = async (id) => {
     const response = await api.get(`/api/matches/${id}`);
     return response.data;
   } catch (error) {
-    return { data: mockMatches.find(m => m.id == id) || mockMatches[0] };
+    return mockMatches.find(m => m.id == id) || mockMatches[0];
   }
 };
 
@@ -57,7 +57,7 @@ export const getLiveMatches = async () => {
     const response = await api.get('/api/matches/live');
     return response.data;
   } catch (error) {
-    return { data: mockMatches.filter(m => m.status === 'LIVE') };
+    return mockMatches.filter(m => m.status === 'LIVE');
   }
 };
 
@@ -66,6 +66,6 @@ export const getUpcomingMatches = async () => {
     const response = await api.get('/api/matches/upcoming');
     return response.data;
   } catch (error) {
-    return { data: mockMatches.filter(m => m.status === 'UPCOMING') };
+    return mockMatches.filter(m => m.status === 'UPCOMING');
   }
 };
