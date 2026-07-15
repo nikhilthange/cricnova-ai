@@ -78,6 +78,7 @@ exports.getUpcomingMatches = async (req, res, next) => {
 
     const upcomingMatches = apiResponse.data
       .filter(match => !match.matchStarted)
+      .sort((a, b) => new Date(a.dateTimeGMT).getTime() - new Date(b.dateTimeGMT).getTime())
       .map(match => ({
         _id: match.id,
         id: match.id,
