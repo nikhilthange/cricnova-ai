@@ -50,7 +50,7 @@ export default function Schedule() {
           {tabs.map(tab => (
             <Button 
               key={tab}
-              variant={activeTab === tab ? "default" : "outline"}
+              variant={activeTab === tab ? "primary" : "outline"}
               size="sm"
               onClick={() => setActiveTab(tab)}
               className={activeTab === tab ? "bg-blue-600 text-white border-blue-600" : "border-slate-300 dark:border-slate-700"}

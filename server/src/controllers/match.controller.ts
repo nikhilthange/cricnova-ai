@@ -103,3 +103,29 @@ exports.getUpcomingMatches = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getMatchInfoById = async (req, res, next) => {
+  try {
+    const apiResponse = await cricketApi.getMatchInfo(req.params.id);
+    if (!apiResponse || !apiResponse.data) {
+      return res.status(404).json({ success: false, message: 'Match not found' });
+    }
+    res.json(apiResponse.data);
+  } catch (error) {
+    console.error("CricAPI Error (Match Info):", error);
+    next(error);
+  }
+};
+
+exports.getMatchScorecardById = async (req, res, next) => {
+  try {
+    const apiResponse = await cricketApi.getMatchScorecard(req.params.id);
+    if (!apiResponse || !apiResponse.data) {
+      return res.status(404).json({ success: false, message: 'Scorecard not found' });
+    }
+    res.json(apiResponse.data);
+  } catch (error) {
+    console.error("CricAPI Error (Scorecard):", error);
+    next(error);
+  }
+};
