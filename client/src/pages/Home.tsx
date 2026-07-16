@@ -45,9 +45,9 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="relative bg-slate-950 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#09090b] via-[#18181b] to-[#3b82f6] opacity-90 z-0"></div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center mix-blend-overlay opacity-20 z-0"></div>
+      <section className="relative bg-white dark:bg-slate-950 overflow-hidden transition-colors duration-300">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-purple-50/80 dark:from-[#09090b] dark:via-[#18181b] dark:to-[#3b82f6]/20 opacity-90 z-0"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center mix-blend-overlay opacity-5 dark:opacity-20 z-0"></div>
         
         <div className="container mx-auto px-4 py-24 sm:py-32 relative z-10">
           <motion.div 
@@ -56,20 +56,20 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="max-w-3xl"
           >
-            <span className="inline-block py-1 px-3 rounded-full bg-blue-500/20 text-blue-300 text-sm font-semibold tracking-wider mb-6 border border-blue-500/30 backdrop-blur-md">
+            <span className="inline-block py-1 px-3 rounded-full bg-blue-100/80 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-sm font-semibold tracking-wider mb-6 border border-blue-200 dark:border-blue-500/30 backdrop-blur-md">
               PREMIUM EXPERIENCE
             </span>
-            <h1 className="text-5xl sm:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+            <h1 className="text-5xl sm:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight">
               The Future of <span className="text-gradient">Cricket</span> is Here.
             </h1>
-            <p className="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl leading-relaxed font-light">
+            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-2xl leading-relaxed font-light">
               Experience the game like never before. Real-time scores, predictive AI insights, advanced charts, and deep player statistics all in one premium platform.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="bg-gradient-premium hover-lift text-white shadow-xl shadow-purple-500/20 text-lg px-8 border-none">
+              <Button size="lg" className="bg-gradient-premium hover-lift text-white shadow-xl shadow-blue-500/20 text-lg px-8 border-none">
                 Explore Live Matches
               </Button>
-              <Button variant="outline" size="lg" className="border-slate-600 text-white hover:bg-slate-800 text-lg px-8 hover-lift glass-panel">
+              <Button variant="outline" size="lg" className="border-slate-300 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-lg px-8 hover-lift glass-panel">
                 View AI Predictions
               </Button>
             </div>
