@@ -2,15 +2,25 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Sun, Moon, Search as SearchIcon } from "lucide-react";
 import { useStore } from "../../store/useStore";
+import { useDebounce } from "../../hooks/useDebounce";
 import { cn } from "../../lib/utils";
 import Button from "../ui/Button";
 import { navLinks } from "./Sidebar";
+
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { theme, toggleTheme } = useStore();
   const location = useLocation();
+  
+  // Search state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 500);
+  const [results, setResults] = useState({ players: [] });
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +32,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsOpen(false);
+    setIsSearchOpen(false);
   }, [location.pathname]);
 
   // Apply theme class to html element
@@ -43,13 +54,42 @@ export default function Navbar() {
     return () => { document.body.style.overflow = "unset"; };
   }, [isOpen]);
 
+  // Search logic
+  useEffect(() => {
+    if (debouncedQuery.length > 2) {
+      setIsSearching(true);
+      const fetchResults = async () => {
+        try {
+          const response = await fetch(`${API_URL}/api/players?search=${encodeURIComponent(debouncedQuery)}`);
+          const data = await response.json();
+          setResults({ players: Array.isArray(data) ? data : [] });
+        } catch (error) {
+          console.error("Search failed:", error);
+          setResults({ players: [] });
+        } finally {
+          setIsSearching(false);
+        }
+      };
+      fetchResults();
+    } else {
+      setResults({ players: [] });
+    }
+  }, [debouncedQuery]);
+
+  useEffect(() => {
+    if (!isSearchOpen) {
+      setQuery("");
+      setResults({ players: [] });
+    }
+  }, [isSearchOpen]);
+
   return (
-    <>
+    <div className="relative">
       <header
         className={cn(
           "sticky top-0 z-40 w-full transition-all duration-300 md:hidden",
-          scrolled
-            ? "bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm"
+          scrolled || isSearchOpen
+            ? "bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm"
             : "bg-transparent"
         )}
       >
@@ -67,11 +107,9 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Link to="/search">
-                <Button variant="ghost" size="icon" aria-label="Search">
-                  <SearchIcon className="h-5 w-5" />
-                </Button>
-              </Link>
+              <Button variant="ghost" size="icon" aria-label="Search" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+                {isSearchOpen ? <X className="h-5 w-5 text-slate-500" /> : <SearchIcon className="h-5 w-5" />}
+              </Button>
               
               <Button
                 variant="ghost"
@@ -103,19 +141,17 @@ export default function Navbar() {
       <header
         className={cn(
           "sticky top-0 z-30 w-full transition-all duration-300 hidden md:block",
-          scrolled
-            ? "bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm"
+          scrolled || isSearchOpen
+            ? "bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm"
             : "bg-transparent"
         )}
       >
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-end">
             <div className="flex items-center gap-4">
-              <Link to="/search">
-                <Button variant="ghost" size="icon" aria-label="Search">
-                  <SearchIcon className="h-5 w-5" />
-                </Button>
-              </Link>
+              <Button variant="ghost" size="icon" aria-label="Search" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+                {isSearchOpen ? <X className="h-5 w-5 text-slate-500" /> : <SearchIcon className="h-5 w-5" />}
+              </Button>
               
               <Button
                 variant="ghost"
@@ -133,6 +169,60 @@ export default function Navbar() {
           </div>
         </div>
       </header>
+
+      {/* Search Overlay */}
+      {isSearchOpen && (
+        <div className="absolute top-full left-0 w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 shadow-xl z-50 animate-in slide-in-from-top-2 p-4">
+          <div className="container mx-auto max-w-3xl relative">
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <input 
+              type="text" 
+              autoFocus
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search players..."
+              className="w-full pl-12 pr-12 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white"
+            />
+            <button 
+              onClick={() => { setQuery(""); setIsSearchOpen(false); }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            {/* Search Results */}
+            {isSearching && (
+              <div className="mt-4 text-center py-4 text-slate-500">
+                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                Searching...
+              </div>
+            )}
+            
+            {!isSearching && results.players.length > 0 && (
+              <div className="mt-4 max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-2 shadow-lg">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 px-3 py-2">Players</h3>
+                <div className="space-y-1">
+                  {results.players.map((p: any) => (
+                    <div key={p.id} className="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors" onClick={() => setIsSearchOpen(false)}>
+                      <img src={p.image} alt={p.name} className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                      <div>
+                        <h4 className="font-bold text-slate-900 dark:text-white text-sm">{p.name}</h4>
+                        <p className="text-xs text-slate-500">{p.country} • {p.role}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {!isSearching && query.length > 2 && results.players.length === 0 && (
+              <div className="mt-4 text-center py-8 text-slate-500">
+                No results found for "{query}"
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Mobile Nav Drawer Overlay */}
       {isOpen && (
@@ -186,6 +276,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

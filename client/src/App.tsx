@@ -20,7 +20,6 @@ const Schedule = lazy(() => import("./pages/Schedule"));
 const PointsTable = lazy(() => import("./pages/PointsTable"));
 const Series = lazy(() => import("./pages/Series"));
 const News = lazy(() => import("./pages/News"));
-const Search = lazy(() => import("./pages/Search"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 
@@ -86,7 +85,6 @@ function App() {
                     <Route path="/rankings" element={<Placeholder title="Rankings" />} />
                     <Route path="/news" element={<News />} />
                     <Route path="/videos" element={<Placeholder title="Videos" />} />
-                    <Route path="/search" element={<Search />} />
                     <Route path="/about" element={<Placeholder title="About" />} />
                     
                     {/* Auth Routes */}
