@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ArrowUp } from "lucide-react";
 import Button from "./components/ui/Button";
 import Navbar from "./components/layout/Navbar";
+import Sidebar from "./components/layout/Sidebar";
 import Footer from "./components/layout/Footer";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { AuthProvider } from "./context/AuthContext";
@@ -66,36 +67,39 @@ function App() {
       <SocketProvider>
         <AuthProvider>
           <BrowserRouter>
-            <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans">
-          <Navbar />
-          <main className="flex-1">
-            <ErrorBoundary>
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/live" element={<LiveScores />} />
-                  <Route path="/matches/:id" element={<MatchCenter />} />
-                  <Route path="/schedule" element={<Schedule />} />
-                  <Route path="/series" element={<Series />} />
-                  <Route path="/teams" element={<Teams />} />
-                  <Route path="/players" element={<Players />} />
-                  <Route path="/points-table" element={<PointsTable />} />
-                  <Route path="/rankings" element={<Placeholder title="Rankings" />} />
-                  <Route path="/news" element={<Placeholder title="News" />} />
-                  <Route path="/videos" element={<Placeholder title="Videos" />} />
-                  <Route path="/search" element={<Placeholder title="Search" />} />
-                  <Route path="/about" element={<Placeholder title="About" />} />
-                  
-                  {/* Auth Routes */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
+            <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-sans">
+          <Sidebar />
+          <div className="flex flex-col flex-1 min-w-0 md:pl-64">
+            <Navbar />
+            <main className="flex-1">
+              <ErrorBoundary>
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/live" element={<LiveScores />} />
+                    <Route path="/matches/:id" element={<MatchCenter />} />
+                    <Route path="/schedule" element={<Schedule />} />
+                    <Route path="/series" element={<Series />} />
+                    <Route path="/teams" element={<Teams />} />
+                    <Route path="/players" element={<Players />} />
+                    <Route path="/points-table" element={<PointsTable />} />
+                    <Route path="/rankings" element={<Placeholder title="Rankings" />} />
+                    <Route path="/news" element={<Placeholder title="News" />} />
+                    <Route path="/videos" element={<Placeholder title="Videos" />} />
+                    <Route path="/search" element={<Placeholder title="Search" />} />
+                    <Route path="/about" element={<Placeholder title="About" />} />
+                    
+                    {/* Auth Routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
 
-                  <Route path="*" element={<Placeholder title="404 Not Found" />} />
-                </Routes>
-              </Suspense>
-            </ErrorBoundary>
-          </main>
-          <Footer />
+                    <Route path="*" element={<Placeholder title="404 Not Found" />} />
+                  </Routes>
+                </Suspense>
+              </ErrorBoundary>
+            </main>
+            <Footer />
+          </div>
 
           {/* Scroll to top button */}
           {showScrollTop && (
