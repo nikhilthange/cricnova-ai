@@ -20,6 +20,9 @@ const Schedule = lazy(() => import("./pages/Schedule"));
 const PointsTable = lazy(() => import("./pages/PointsTable"));
 const Series = lazy(() => import("./pages/Series"));
 const News = lazy(() => import("./pages/News"));
+const Rankings = lazy(() => import("./pages/Rankings"));
+const Videos = lazy(() => import("./pages/Videos"));
+const About = lazy(() => import("./pages/About"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 
@@ -27,18 +30,6 @@ const Register = lazy(() => import("./pages/Register"));
 const PageLoader = () => (
   <div className="flex h-[60vh] items-center justify-center">
     <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-  </div>
-);
-
-// Placeholder pages to ensure routing works for unfinished pages
-const Placeholder = ({ title }) => (
-  <div className="flex h-[60vh] items-center justify-center animate-in fade-in">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-slate-800 dark:text-slate-200 mb-4">{title}</h1>
-      <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-        This page is under development and will be available in the upcoming release.
-      </p>
-    </div>
   </div>
 );
 
@@ -82,16 +73,16 @@ function App() {
                     <Route path="/teams" element={<Teams />} />
                     <Route path="/players" element={<Players />} />
                     <Route path="/points-table" element={<PointsTable />} />
-                    <Route path="/rankings" element={<Placeholder title="Rankings" />} />
+                    <Route path="/rankings" element={<Rankings />} />
                     <Route path="/news" element={<News />} />
-                    <Route path="/videos" element={<Placeholder title="Videos" />} />
-                    <Route path="/about" element={<Placeholder title="About" />} />
+                    <Route path="/videos" element={<Videos />} />
+                    <Route path="/about" element={<About />} />
                     
                     {/* Auth Routes */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
 
-                    <Route path="*" element={<Placeholder title="404 Not Found" />} />
+                    <Route path="*" element={<div className="text-center py-20 text-2xl font-bold">404 Not Found</div>} />
                   </Routes>
                 </Suspense>
               </ErrorBoundary>
