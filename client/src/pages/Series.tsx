@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Trophy, Activity, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import { Card, CardContent } from '../components/ui/Card';
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Series() {
   const [seriesList, setSeriesList] = useState([]);
@@ -11,7 +12,7 @@ export default function Series() {
   useEffect(() => {
     const fetchSeries = async () => {
       try {
-        const res = await axios.get('/api/series');
+        const res = await axios.get(`${API_URL}/api/series`);
         // Sort by start date, newest first (or ongoing first)
         const sorted = (res.data || []).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
         setSeriesList(sorted);
