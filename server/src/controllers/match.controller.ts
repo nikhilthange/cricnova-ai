@@ -34,7 +34,7 @@ exports.getLiveMatches = async (req, res, next) => {
     const apiResponse = await cricketApi.getCurrentMatches();
     
     if (!apiResponse || !apiResponse.data) {
-      return res.json({ success: true, data: [] });
+      return res.json([]);
     }
 
     const liveMatches = apiResponse.data
