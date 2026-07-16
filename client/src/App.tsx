@@ -84,9 +84,9 @@ function App() {
                     <Route path="/players" element={<Players />} />
                     <Route path="/points-table" element={<PointsTable />} />
                     <Route path="/rankings" element={<Placeholder title="Rankings" />} />
-                    <Route path="/news" element={<Placeholder title="News" />} />
+                    <Route path="/news" element={<News />} />
                     <Route path="/videos" element={<Placeholder title="Videos" />} />
-                    <Route path="/search" element={<Placeholder title="Search" />} />
+                    <Route path="/search" element={<Search />} />
                     <Route path="/about" element={<Placeholder title="About" />} />
                     
                     {/* Auth Routes */}
