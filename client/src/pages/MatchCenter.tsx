@@ -163,7 +163,7 @@ export default function MatchCenter() {
                     <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">
                       {inning.inning} - {inning.totals?.R}/{inning.totals?.W} ({inning.totals?.O} ov)
                     </h3>
-                    <table className="w-full text-left border-collapse min-w-[600px]">
+                    <table className="w-full text-left border-collapse min-w-[600px] whitespace-nowrap">
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-700">
                           <th className="py-2 text-slate-500 font-medium">Batsman</th>

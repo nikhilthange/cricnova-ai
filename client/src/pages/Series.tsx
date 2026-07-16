@@ -88,7 +88,7 @@ export default function Series() {
                   {series.name}
                 </h3>
                 
-                <div className="grid grid-cols-4 gap-2 mb-4 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800 text-center">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800 text-center">
                   <div>
                     <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Matches</p>
                     <p className="font-bold text-slate-800 dark:text-slate-200">{series.matches}</p>

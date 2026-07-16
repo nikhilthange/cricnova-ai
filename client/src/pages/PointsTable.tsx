@@ -41,7 +41,7 @@ export default function PointsTable() {
         <div className="glass-card rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800">
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs uppercase bg-slate-100 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+              <thead className="text-xs uppercase whitespace-nowrap bg-slate-100 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th scope="col" className="px-6 py-4 font-semibold">Pos</th>
                   <th scope="col" className="px-6 py-4 font-semibold">Team</th>

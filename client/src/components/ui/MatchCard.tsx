@@ -26,27 +26,27 @@ export default function MatchCard({ match }) {
         
         <CardContent className="p-4 pt-5">
           <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               {match.team1?.logo?.startsWith('http') ? (
-                <img src={match.team1.logo} alt={match.team1?.code} className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-full bg-slate-100 dark:bg-slate-800 p-1" />
+                <img src={match.team1.logo} alt={match.team1?.code} className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-full bg-slate-100 dark:bg-slate-800 p-1 flex-shrink-0" />
               ) : (
-                <span className="text-2xl">{match.team1?.logo || "🏏"}</span>
+                <span className="text-2xl flex-shrink-0">{match.team1?.logo || "🏏"}</span>
               )}
-              <div>
-                <h4 className="font-bold text-slate-900 dark:text-slate-100">{match.team1?.code || match.team1}</h4>
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{match.score1}</p>
+              <div className="min-w-0">
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 truncate">{match.team1?.code || match.team1}</h4>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 truncate">{match.score1}</p>
               </div>
             </div>
-            <div className="text-xs font-bold text-slate-400 dark:text-slate-500">VS</div>
-            <div className="flex items-center gap-3 flex-row-reverse text-right">
+            <div className="text-xs font-bold text-slate-400 dark:text-slate-500 mx-2 flex-shrink-0">VS</div>
+            <div className="flex items-center gap-3 flex-row-reverse text-right min-w-0 flex-1">
               {match.team2?.logo?.startsWith('http') ? (
-                <img src={match.team2.logo} alt={match.team2?.code} className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-full bg-slate-100 dark:bg-slate-800 p-1" />
+                <img src={match.team2.logo} alt={match.team2?.code} className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-full bg-slate-100 dark:bg-slate-800 p-1 flex-shrink-0" />
               ) : (
-                <span className="text-2xl">{match.team2?.logo || "🏏"}</span>
+                <span className="text-2xl flex-shrink-0">{match.team2?.logo || "🏏"}</span>
               )}
-              <div>
-                <h4 className="font-bold text-slate-900 dark:text-slate-100">{match.team2?.code || match.team2}</h4>
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{match.score2}</p>
+              <div className="min-w-0">
+                <h4 className="font-bold text-slate-900 dark:text-slate-100 truncate">{match.team2?.code || match.team2}</h4>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 truncate">{match.score2}</p>
               </div>
             </div>
           </div>
