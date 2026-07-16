@@ -1,4 +1,4 @@
-import { PlayCircle, Youtube } from "lucide-react";
+import { PlayCircle, Video } from "lucide-react";
 
 const mockVideos = [
   {
@@ -51,7 +51,7 @@ export default function Videos() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-3">
-            <Youtube className="w-8 h-8 text-red-500" />
+            <Video className="w-8 h-8 text-red-500" />
             Highlights & Media
           </h1>
           <p className="text-slate-500 dark:text-slate-400">Watch the most iconic moments in cricket history</p>
