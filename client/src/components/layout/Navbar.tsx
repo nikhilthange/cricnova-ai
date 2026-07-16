@@ -88,8 +88,8 @@ export default function Navbar() {
       <header
         className={cn(
           "sticky top-0 z-40 w-full transition-all duration-300 md:hidden",
-          scrolled || isSearchOpen
-            ? "bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm"
+            scrolled || isSearchOpen
+              ? "glass-panel shadow-sm"
             : "bg-transparent"
         )}
       >
@@ -141,8 +141,8 @@ export default function Navbar() {
       <header
         className={cn(
           "sticky top-0 z-30 w-full transition-all duration-300 hidden md:block",
-          scrolled || isSearchOpen
-            ? "bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm"
+            scrolled || isSearchOpen
+              ? "glass-panel shadow-sm"
             : "bg-transparent"
         )}
       >
