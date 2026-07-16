@@ -2,12 +2,77 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#09090b" />
+    
+    <!-- Primary Meta Tags -->
+    <title>CricNova - The Future of Live Cricket Scores & AI Analytics</title>
+    <meta name="title" content="CricNova - The Future of Live Cricket Scores & AI Analytics" />
+    <meta name="description" content="Experience cricket like never before. CricNova offers real-time live scores, predictive AI insights, advanced statistical charts, and deep player analytics." />
+    <meta name="keywords" content="cricket, live cricket scores, cricket AI, cricket analytics, win predictor, ICC rankings, live match updates, cricket stats" />
+    <meta name="author" content="CricNova" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://cricnova-ai.vercel.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cricnova-ai.vercel.app/" />
+    <meta property="og:title" content="CricNova - Live Cricket Scores & AI Analytics" />
+    <meta property="og:description" content="Get real-time live scores, predictive AI insights, advanced statistical charts, and deep player analytics." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://cricnova-ai.vercel.app/" />
+    <meta property="twitter:title" content="CricNova - Live Cricket Scores & AI Analytics" />
+    <meta property="twitter:description" content="Get real-time live scores, predictive AI insights, advanced statistical charts, and deep player analytics." />
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" />
+
+    <!-- Fonts and Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <title>CricNova</title>
+    
+    <!-- JSON-LD Structured Data for AEO/GEO (AI Chatbots & Search Engines) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://cricnova-ai.vercel.app/#website",
+          "url": "https://cricnova-ai.vercel.app/",
+          "name": "CricNova",
+          "description": "The ultimate platform for live cricket scores and AI-powered analytics.",
+          "publisher": {
+            "@id": "https://cricnova-ai.vercel.app/#organization"
+          },
+          "potentialAction": [{
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://cricnova-ai.vercel.app/players?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://cricnova-ai.vercel.app/#organization",
+          "name": "CricNova AI",
+          "url": "https://cricnova-ai.vercel.app/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://cricnova-ai.vercel.app/favicon.svg"
+          },
+          "sameAs": [
+            "https://twitter.com/cricnova"
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
