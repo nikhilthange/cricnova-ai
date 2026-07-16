@@ -8,18 +8,28 @@ export default function Search() {
   const [results, setResults] = useState({ players: [], teams: [], matches: [] });
   const [isSearching, setIsSearching] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   useEffect(() => {
     if (debouncedQuery.length > 2) {
       setIsSearching(true);
-      // Simulate API search
-      setTimeout(() => {
-        setResults({
-          players: debouncedQuery.toLowerCase() === 'virat' ? [{ name: 'Virat Kohli' }] : [],
-          teams: debouncedQuery.toLowerCase() === 'ind' ? [{ name: 'India' }] : [],
-          matches: [],
-        });
-        setIsSearching(false);
-      }, 800);
+      const fetchResults = async () => {
+        try {
+          const response = await fetch(`${API_URL}/api/players?search=${encodeURIComponent(debouncedQuery)}`);
+          const data = await response.json();
+          setResults({
+            players: Array.isArray(data) ? data : [],
+            teams: [],
+            matches: [],
+          });
+        } catch (error) {
+          console.error("Search failed:", error);
+          setResults({ players: [], teams: [], matches: [] });
+        } finally {
+          setIsSearching(false);
+        }
+      };
+      fetchResults();
     } else {
       setResults({ players: [], teams: [], matches: [] });
     }
@@ -57,7 +67,17 @@ export default function Search() {
               <h3 className="text-xl font-bold flex items-center gap-2 mb-4 border-b border-slate-200 dark:border-slate-800 pb-2">
                 <Users className="text-blue-500" /> Players
               </h3>
-              {results.players.map((p, i) => <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">{p.name}</div>)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {results.players.map((p: any, i) => (
+                  <div key={p.id || i} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center gap-4 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700">
+                    <img src={p.image} alt={p.name} className="w-12 h-12 rounded-full object-cover border border-slate-300 dark:border-slate-600" />
+                    <div>
+                      <h4 className="font-bold text-slate-900 dark:text-white">{p.name}</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{p.country} • {p.role}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {results.teams.length > 0 && (
