@@ -6,7 +6,7 @@ import { WinProbabilityChart } from '../components/charts/WinProbabilityChart';
 import { useSocket } from '../context/SocketContext';
 import { Trophy, Activity, MessageSquare, Info, AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
-import axios from 'axios';
+import api from '../services/api';
 
 // Mock Data
 const mockRRData = Array.from({ length: 20 }, (_, i) => ({
@@ -38,8 +38,8 @@ export default function MatchCenter() {
       try {
         setLoading(true);
         const [infoRes, scoreRes] = await Promise.all([
-          axios.get(`/api/matches/info/${id}`).catch(() => ({ data: null })),
-          axios.get(`/api/matches/scorecard/${id}`).catch(() => ({ data: null }))
+          api.get(`/api/matches/info/${id}`).catch(() => ({ data: null })),
+          api.get(`/api/matches/scorecard/${id}`).catch(() => ({ data: null }))
         ]);
         setMatchInfo(infoRes.data);
         setScorecard(scoreRes.data);
